@@ -1,0 +1,58 @@
+{
+  "name": "en-route",
+  "description": "Routing for static site generators and build systems, heavily based on express.js and kerouac routes.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/en-route",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/en-route.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/en-route/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [
+    "app",
+    "assemble",
+    "express",
+    "file",
+    "filepath",
+    "kerouac",
+    "middleware",
+    "path",
+    "regex",
+    "regexp",
+    "route",
+    "router",
+    "routes",
+    "routing",
+    "site",
+    "static"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "debug": "^1.0.4",
+    "verb": ">= 0.2.6",
+    "verb-tag-jscomments": ">= 0.1.4"
+  },
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "path-to-regexp": "^0.2.3"
+  }
+}

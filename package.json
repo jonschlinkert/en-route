@@ -1,7 +1,7 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators and build systems, heavily based on express.js and kerouac routes.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
     "name": "Jon Schlinkert",

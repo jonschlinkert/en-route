@@ -1,7 +1,7 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators and build systems, heavily based on express.js and kerouac routes.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
     "name": "Jon Schlinkert",
@@ -49,7 +49,7 @@
     "chai": "^1.9.1",
     "debug": "^1.0.4",
     "verb": ">= 0.2.6",
-    "verb-tag-jscomments": "^0.2.0"
+    "verb-tag-jscomments": "^0.2.2"
   },
   "dependencies": {
     "lodash": "^2.4.1",

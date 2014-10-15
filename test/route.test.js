@@ -77,4 +77,17 @@ describe('Route', function() {
       expect(route.match('/not-blog/2014/08/01/assemble-v0.6.0')).to.be.false;
     });
   });
+
+  describe('with filter function', function () {
+    var filter = function (obj) {
+      return (!('draft' in obj) || obj.draft === false);
+    };
+    var route = new Route(filter, [ function () {} ]);
+
+    it('should match correctly', function () {
+      expect(route.match({})).to.be.true;
+      expect(route.match({draft: false})).to.be.true;
+      expect(route.match({draft: true})).to.be.false;
+    });
+  });
 });

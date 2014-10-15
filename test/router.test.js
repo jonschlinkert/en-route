@@ -458,12 +458,10 @@ describe('Router', function() {
 
       var router = new Router();
 
-      router.route('/blog/:year/:month/:day/:slug',
-        function (page, next) {
-          if (this.matchStr(page.path)) {
-            return next();
-          }
-          next('route');
+      router.route(
+        function (page) {
+          this.createPathRegex('/blog/:year/:month/:day/:slug');
+          return this.matchStr(page.path);
         },
         function(page, next) {
           page.gotParams = [];
@@ -474,12 +472,10 @@ describe('Router', function() {
           next();
         });
 
-      router.route('/blog/2013/04/20/foo', 
-        function (page, next) {
-          if (this.matchStr(page.path)) {
-            return next();
-          }
-          next('route');
+      router.route( 
+        function (page) {
+          this.createPathRegex('/blog/2013/04/20/foo');
+          return this.matchStr(page.path);
         },
         function(page, next) {
           page.blogPage = true;

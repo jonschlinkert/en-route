@@ -140,10 +140,10 @@ describe('Router Sync', function() {
 
     router.route('/blog/:year/:month/:day/:slug', function(page, next) {
       page.gotParams = [];
-      page.gotParams.push(page.params['year']);
-      page.gotParams.push(page.params['month']);
-      page.gotParams.push(page.params['day']);
-      page.gotParams.push(page.params['slug']);
+      page.gotParams.push(this.params['year']);
+      page.gotParams.push(this.params['month']);
+      page.gotParams.push(this.params['day']);
+      page.gotParams.push(this.params['slug']);
       next();
     });
 

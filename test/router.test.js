@@ -8,12 +8,12 @@ describe('Router', function() {
   describe('with two simple routes', function() {
     var router = new Router();
 
-    router.route('/foo', function(page, next) {
+    router.route('/foo', function(key, page, next) {
       page.routedToFoo = true;
       next();
     });
 
-    router.route('/bar', function(page, next) {
+    router.route('/bar', function(key, page, next) {
       page.routedToBar = true;
       next();
     });
@@ -25,7 +25,7 @@ describe('Router', function() {
     it('should dispatch /foo', function(done) {
       var page = {};
       page.path = '/foo'
-      router.middleware(page, function(err) {
+      router.middleware(page.path, page, function(err) {
         if (err) { return done(err); }
         expect(page.routedToFoo).to.be.true;
         expect(page.routedToBar).to.be.undefined;
@@ -37,7 +37,7 @@ describe('Router', function() {
       var page = {};
       page.path = '/bar'
 
-      router.middleware(page, function(err) {
+      router.middleware(page.path, page, function(err) {
         if (err) { return done(err); }
         expect(page.routedToFoo).to.be.undefined;
         expect(page.routedToBar).to.be.true;
@@ -64,15 +64,15 @@ describe('Router', function() {
     var router = new Router();
 
     router.route('/foo',
-      function(page, next) {
+      function(key, page, next) {
         page.routedTo = [ '1' ];
         next();
       },
-      function(page, next) {
+      function(key, page, next) {
         page.routedTo.push('2');
         next();
       },
-      function(page, next) {
+      function(key, page, next) {
         page.routedTo.push('3');
         next();
       });
@@ -81,7 +81,7 @@ describe('Router', function() {
       var page = {};
       page.path = '/foo'
 
-      router.middleware(page, function(err) {
+      router.middleware(page.path, page, function(err) {
         if (err) { return done(err); }
         expect(page.routedTo).to.be.an.instanceOf(Array);
         expect(page.routedTo).to.have.length(3);
@@ -140,10 +140,10 @@ describe('Router', function() {
 
     router.route('/blog/:year/:month/:day/:slug', function(page, next) {
       page.gotParams = [];
-      page.gotParams.push(page.params['year']);
-      page.gotParams.push(page.params['month']);
-      page.gotParams.push(page.params['day']);
-      page.gotParams.push(page.params['slug']);
+      page.gotParams.push(this.params['year']);
+      page.gotParams.push(this.params['month']);
+      page.gotParams.push(this.params['day']);
+      page.gotParams.push(this.params['slug']);
       next();
     });
 

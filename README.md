@@ -1,4 +1,4 @@
-# en-route [![NPM version](https://badge.fury.io/js/en-route.png)](http://badge.fury.io/js/en-route)
+# en-route [![NPM version](https://badge.fury.io/js/en-route.svg)](http://badge.fury.io/js/en-route)
 
 > Routing for static site generators and build systems, heavily based on express.js and kerouac routes.
 
@@ -11,53 +11,48 @@ npm i en-route --save
 
 
 ## API
-### Router
 
-[## Router](lib/router.js#L21)
+### [Router](lib/router.js#L21)
 
 Initialize a new `Router` with the given `options`.
 
-* `options` **{Object}**  
+* `options` **{Object}**    
 
 ```js
 var Router = require('en-route');
 var router = new Router(options);
 ```
 
+### [.middleware](lib/router.js#L36)
 
- [## middleware](lib/router.js#L36)
+* `file` **{Object}**: File object.    
+* `next` **{Function}**: Callback.    
+* `returns`: {Object}  
 
+Call the dispatcher on a `file` object.
 
+### [.middlewareSync](lib/router.js#L49)
 
-* `file` **{Object}**: File object.  
-* `next` **{Function}**: Callback.  
-* returns: {Object}  Call the dispatcher on a `file` object.
+* `file` **{Object}**: File object.    
+* `returns` **{Object}**: object containing an `err` if an error occurred.  
 
+Call the dispatcher on a `file` object.
 
- [## middlewareSync](lib/router.js#L49)
+### [.route](lib/router.js#L63)
 
+* `filepath` **{String}**    
+* `middleware` **{Function|Array}**: Middleware stack.    
+* `returns`: {Object}  
 
+Route `filepath` to one or more callbacks.
 
-* `file` **{Object}**: File object.  
-* returns **{Object}**: object containing an `err` if an error occurred.  Call the dispatcher on a `file` object.
-
-
- [## route](lib/router.js#L63)
-
-
-
-* `filepath` **{String}**  
-* `middleware` **{Function|Array}**: Middleware stack.  
-* returns: {Object}  Route `filepath` to one or more callbacks.
-
-
- [## use](lib/router.js#L220)
+### [.use](lib/router.js#L232)
 
 Utilize the given middleware `fn` to the given `path`, defaulting to `_/_`.
 
-* `path` **{String|Function}**  
-* `fn` **{Function}**  
-* returns **{Router}**: for chaining.  
+* `path` **{String|Function}**    
+* `fn` **{Function}**    
+* `returns` **{Router}**: for chaining.  
 
 **Example:**
 

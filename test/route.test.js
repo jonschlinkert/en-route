@@ -78,6 +78,15 @@ describe('Route', function() {
     });
   });
 
+  describe('with regexp', function () {
+    var route = new Route(/\.md/, [ function () {} ]);
+
+    it('should match correctly', function () {
+      expect(route.match('/path/to/post.md')).to.be.true;
+      expect(route.match('/path/to/template.hbs')).to.be.false;
+    });
+  });
+
   describe('with filter function', function () {
     var filter = function (obj) {
       return (!('draft' in obj) || obj.draft === false);

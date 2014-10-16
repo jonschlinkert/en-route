@@ -23,30 +23,73 @@ var Router = require('en-route');
 var router = new Router(options);
 ```
 
-### [.middleware](lib/router.js#L36)
+### [.route](lib/router.js#L61)
 
-* `file` **{Object}**: File object.    
+Create a route for a `filter` that will call a `middleware` stack when the `filter` is matched.
+
+* `filter` **{Function|String}**: Either a string to match on or a function that filters.    
+* `middleware` **{Function|Array}**: Middleware stack.    
+* `returns`: {Object}  
+
+```js
+// using a filepath as the filter
+router.route('/path/to/:filename.md', function (key, value, next) {
+  // process value
+  value.content = markdown(value.content);
+  value.options.ext = '.html'
+
+  // use the params from the filepath (:filename)
+  console.log(this.params.filename);
+
+  // done, so call the next middleware
+  next();
+});
+
+// using a function as the filter
+router.route(function (key, value) {
+  // only process files that are not drafts
+  return (!('drafts' in value.data) || (!value.data.draft && value.data.draft === false));
+}, function (key, value, next) {
+  // process value
+  // done, so call the next middleware
+  next();
+});
+```
+
+### [.middleware](lib/router.js#L108)
+
+Call the dispatcher on on arguments
+
+* `arguments` **{arguments}**: Any arguments are passed through the dispatcher. The arguments must match the arguments expected by the filter and middleware.    
 * `next` **{Function}**: Callback.    
 * `returns`: {Object}  
 
-Call the dispatcher on a `file` object.
+```js
+var page = {
+  path: 'some/file/path.md',
+  data: {
+    draft: false
+  },
+  options: {
+    ext: '.md'
+  }
+};
+router.middleware(page.path, page, function (err) {
+  if (err) {
+    // something bad happened
+  }
+  // everything is good
+});
+```
 
-### [.middlewareSync](lib/router.js#L49)
+### [.middlewareSync](lib/router.js#L121)
 
 * `file` **{Object}**: File object.    
 * `returns` **{Object}**: object containing an `err` if an error occurred.  
 
 Call the dispatcher on a `file` object.
 
-### [.route](lib/router.js#L63)
-
-* `filepath` **{String}**    
-* `middleware` **{Function|Array}**: Middleware stack.    
-* `returns`: {Object}  
-
-Route `filepath` to one or more callbacks.
-
-### [.use](lib/router.js#L232)
+### [.use](lib/router.js#L275)
 
 Utilize the given middleware `fn` to the given `path`, defaulting to `_/_`.
 

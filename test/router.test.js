@@ -945,7 +945,7 @@ describe('Router', function() {
         });
 
         it('should have two stages', function() {
-          expect(Object.keys(router._stages)).to.have.length(2);
+          expect(Object.keys(router.stages)).to.have.length(2);
         });
 
         it('should dispatch first', function(done) {
@@ -1234,7 +1234,7 @@ describe('Router', function() {
 
 
         it('should have two stages', function() {
-          expect(Object.keys(router._stages)).to.have.length(2);
+          expect(Object.keys(router.stages)).to.have.length(2);
         });
 
         it('should dispatch first', function(done) {

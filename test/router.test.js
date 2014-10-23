@@ -927,4 +927,283 @@ describe('Router', function() {
 
   });
 
+  describe('.use', function () {
+
+    // describe('with two simple stages', function() {
+    //   var router = new Router();
+
+    //   router.use('first', function(key, page, next) {
+    //     page.routedToFirst = true;
+    //     next();
+    //   });
+
+    //   router.use('second', function(key, page, next) {
+    //     page.routedToSecond = true;
+    //     next();
+    //   });
+
+    //   it('should have two stages', function() {
+    //     expect(Object.keys(router._stages)).to.have.length(2);
+    //   });
+
+    //   it('should dispatch first', function(done) {
+    //     var page = {};
+    //     page.path = '/foo'
+    //     router.stage('first', page.path, page, function(err) {
+    //       if (err) { return done(err); }
+    //       expect(page.routedToFirst).to.be.true;
+    //       expect(page.routedToSecond).to.be.undefined;
+    //       done();
+    //     })
+    //   });
+
+    //   it('should dispatch second', function(done) {
+    //     var page = {};
+    //     page.path = '/bar'
+
+    //     router.stage('second', page.path, page, function(err) {
+    //       if (err) { return done(err); }
+    //       expect(page.routedToFirst).to.be.undefined;
+    //       expect(page.routedToSecond).to.be.true;
+    //       done();
+    //     })
+    //   });
+
+    //   it('should not dispatch third', function(done) {
+    //     var page = {};
+    //     page.path = '/baz'
+
+    //     router.stage('third', page.path, page, function(err) {
+    //       if (err) { return done(err); }
+    //       expect(page.routedToFirst).to.be.undefined;
+    //       expect(page.routedToSecond).to.be.undefined;
+    //       done();
+    //     })
+    //   });
+
+    // });
+
+    describe('with stage containing multiple callbacks', function() {
+
+      var router = new Router();
+
+      router.use('first',
+        function(key, page, next) {
+          page.routedTo = [ '1' ];
+          next();
+        },
+        function(key, page, next) {
+          page.routedTo.push('2');
+          next();
+        },
+        function(key, page, next) {
+          page.routedTo.push('3');
+          next();
+        });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page.path, page, function(err) {
+          if (err) { return done(err); }
+          expect(page.routedTo).to.be.an.instanceOf(Array);
+          expect(page.routedTo).to.have.length(3);
+          expect(page.routedTo[0]).to.equal('1');
+          expect(page.routedTo[1]).to.equal('2');
+          expect(page.routedTo[2]).to.equal('3');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage containing multiple callbacks some of which are skipped', function() {
+
+      var router = new Router();
+
+      router.use('first',
+        function(page, next) {
+          page.routedTo = [ 'a1' ];
+          next();
+        },
+        function(page, next) {
+          page.routedTo.push('a2');
+          next('route');
+        },
+        function(page, next) {
+          page.routedTo.push('a3');
+          next();
+        });
+
+      router.use('first', function(page, next) {
+        page.routedTo.push('b1');
+        next();
+      });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          if (err) { return done(err); }
+          expect(page.routedTo).to.be.an.instanceOf(Array);
+          expect(page.routedTo).to.have.length(3);
+          expect(page.routedTo[0]).to.equal('a1');
+          expect(page.routedTo[1]).to.equal('a2');
+          expect(page.routedTo[2]).to.equal('b1');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage that encounters an error', function() {
+
+      var router = new Router();
+
+      router.use('first', function(page, next) {
+        next(new Error('something went wrong'));
+      });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          expect(err).to.not.be.undefined;
+          expect(err.message).to.equal('something went wrong');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage that throws an exception', function() {
+
+      var router = new Router();
+
+      router.use('first', function(page, next) {
+        throw new Error('something went horribly wrong');
+      });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          expect(err).to.not.be.undefined;
+          expect(err.message).to.equal('something went horribly wrong');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage containing error handling that is not called', function() {
+
+      var router = new Router();
+
+      router.use('first',
+        function(page, next) {
+          page.routedTo = [ '1' ];
+          next();
+        },
+        function(page, next) {
+          page.routedTo.push('2');
+          next();
+        },
+        function(err, page, next) {
+          page.routedTo.push('error');
+          next();
+        });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          if (err) { return done(err); }
+          expect(page.routedTo).to.be.an.instanceOf(Array);
+          expect(page.routedTo).to.have.length(2);
+          expect(page.routedTo[0]).to.equal('1');
+          expect(page.routedTo[1]).to.equal('2');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage containing error handling that is called', function() {
+
+      var router = new Router();
+
+      router.use('first',
+        function(page, next) {
+          page.routedTo = [ '1' ];
+          next(new Error('1 error'));
+        },
+        function(page, next) {
+          page.routedTo.push('2');
+          next();
+        },
+        function(err, page, next) {
+          page.routedTo.push(err.message);
+          next();
+        });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          if (err) { return done(err); }
+          expect(page.routedTo).to.be.an.instanceOf(Array);
+          expect(page.routedTo).to.have.length(2);
+          expect(page.routedTo[0]).to.equal('1');
+          expect(page.routedTo[1]).to.equal('1 error');
+          done();
+        })
+      });
+
+    });
+
+    describe('with stage containing error handling that is called due to an exception', function() {
+
+      var router = new Router();
+
+      router.use('first',
+        function(page, next) {
+          page.routedTo = [ '1' ];
+          wtf
+          next();
+        },
+        function(page, next) {
+          page.routedTo.push('2');
+          next();
+        },
+        function(err, page, next) {
+          page.routedTo.push(err.message);
+          next();
+        });
+
+      it('should dispatch first', function(done) {
+        var page = {};
+        page.path = '/foo'
+
+        router.stage('first', page, function(err) {
+          if (err) { return done(err); }
+          expect(page.routedTo).to.be.an.instanceOf(Array);
+          expect(page.routedTo).to.have.length(2);
+          expect(page.routedTo[0]).to.equal('1');
+          expect(page.routedTo[1]).to.have.string('is not defined');
+          done();
+        })
+      });
+
+    });
+
+
+  });
+
 });

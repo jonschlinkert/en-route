@@ -22,7 +22,7 @@ describe('Router', function() {
       });
 
       it('should have two routes', function() {
-        expect(router._routes).to.have.length(2);
+        expect(router.stack).to.have.length(2);
       });
 
       it('should dispatch /foo', function(done) {
@@ -336,7 +336,7 @@ describe('Router', function() {
       });
 
       it('should have two routes', function() {
-        expect(router._routes).to.have.length(2);
+        expect(router.stack).to.have.length(2);
       });
 
       it('should dispatch /foo', function(done) {
@@ -603,7 +603,7 @@ describe('Router', function() {
     describe('with two simple routes', function() {
       var router = new Router();
 
-      router.route(function (page) {return page.path.indexOf('foo') !== -1; }, 
+      router.route(function (page) {return page.path.indexOf('foo') !== -1; },
       function(page, next) {
         page.routedToFoo = true;
         next();
@@ -616,7 +616,7 @@ describe('Router', function() {
       });
 
       it('should have two routes', function() {
-        expect(router._routes).to.have.length(2);
+        expect(router.stack).to.have.length(2);
       });
 
       it('should dispatch /foo', function(done) {
@@ -750,7 +750,7 @@ describe('Router', function() {
           next();
         });
 
-      router.route( 
+      router.route(
         function (page) {
           this.createPathRegex('/blog/2013/04/20/foo');
           return this.matchStr(page.path);

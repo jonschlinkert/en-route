@@ -19,14 +19,14 @@ describe('Router Sync', function() {
     });
 
     it('should have two routes', function() {
-      expect(router._routes).to.have.length(2);
+      expect(router.stack).to.have.length(2);
     });
 
     it('should dispatch /foo', function() {
       var page = {};
       page.path = '/foo'
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedToFoo).to.be.true;
@@ -38,7 +38,7 @@ describe('Router Sync', function() {
       page.path = '/bar'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedToFoo).to.be.undefined;
@@ -50,7 +50,7 @@ describe('Router Sync', function() {
       page.path = '/baz'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedToFoo).to.be.undefined;
@@ -82,7 +82,7 @@ describe('Router Sync', function() {
       page.path = '/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedTo).to.be.an.instanceOf(Array);
@@ -122,7 +122,7 @@ describe('Router Sync', function() {
       page.path = '/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedTo).to.be.an.instanceOf(Array);
@@ -140,10 +140,10 @@ describe('Router Sync', function() {
 
     router.route('/blog/:year/:month/:day/:slug', function(page, next) {
       page.gotParams = [];
-      page.gotParams.push(page.params['year']);
-      page.gotParams.push(page.params['month']);
-      page.gotParams.push(page.params['day']);
-      page.gotParams.push(page.params['slug']);
+      page.gotParams.push(this.params['year']);
+      page.gotParams.push(this.params['month']);
+      page.gotParams.push(this.params['day']);
+      page.gotParams.push(this.params['slug']);
       next();
     });
 
@@ -157,7 +157,7 @@ describe('Router Sync', function() {
       page.path = '/blog/2013/04/20/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.gotParams).to.have.length(4);
@@ -231,7 +231,7 @@ describe('Router Sync', function() {
       page.path = '/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedTo).to.be.an.instanceOf(Array);
@@ -265,7 +265,7 @@ describe('Router Sync', function() {
       page.path = '/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedTo).to.be.an.instanceOf(Array);
@@ -300,7 +300,7 @@ describe('Router Sync', function() {
       page.path = '/foo'
 
       var results = router.middlewareSync(page);
-      if (results.err) { 
+      if (results.err) {
         throw new Error(results.err);
       }
       expect(page.routedTo).to.be.an.instanceOf(Array);

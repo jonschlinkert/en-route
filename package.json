@@ -46,13 +46,16 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "after": "^0.8.1",
     "chai": "^1.9.1",
     "debug": "^1.0.4",
+    "should": "^4.1.0",
     "verb": ">= 0.2.6",
     "verb-tag-jscomments": "^0.2.2"
   },
   "dependencies": {
     "lodash": "^2.4.1",
-    "path-to-regexp": "^0.2.3"
+    "path-to-regexp": "^0.2.3",
+    "utils-merge": "^1.0.0"
   }
 }

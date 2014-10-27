@@ -1,3 +1,8 @@
 'use strict';
 
-module.exports = require('./lib');
+var Route = require('./lib/route');
+var Router = require('./lib');
+
+module.exports.Route = Route;
+module.exports.Router = Router;
+

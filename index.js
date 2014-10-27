@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./lib/router');
+module.exports = require('./lib');

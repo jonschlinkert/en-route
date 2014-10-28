@@ -927,19 +927,19 @@ describe('Router', function() {
 
   });
 
-  describe('.use', function () {
+  describe('.runStage', function () {
 
     describe('only stages', function () {
 
       describe('with two simple stages', function() {
         var router = new Router();
 
-        router.use('first', function(key, page, next) {
+        router.runStage('first', function(key, page, next) {
           page.routedToFirst = true;
           next();
         });
 
-        router.use('second', function(key, page, next) {
+        router.runStage('second', function(key, page, next) {
           page.routedToSecond = true;
           next();
         });
@@ -989,7 +989,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(key, page, next) {
             page.routedTo = [ '1' ];
             next();
@@ -1024,7 +1024,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.routedTo = [ 'a1' ];
             next();
@@ -1038,7 +1038,7 @@ describe('Router', function() {
             next();
           });
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           page.routedTo.push('b1');
           next();
         });
@@ -1064,7 +1064,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           next(new Error('something went wrong'));
         });
 
@@ -1085,7 +1085,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           throw new Error('something went horribly wrong');
         });
 
@@ -1106,7 +1106,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.routedTo = [ '1' ];
             next();
@@ -1140,7 +1140,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.routedTo = [ '1' ];
             next(new Error('1 error'));
@@ -1174,7 +1174,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.routedTo = [ '1' ];
             wtf
@@ -1212,12 +1212,12 @@ describe('Router', function() {
       describe('with two simple stages and two simeple routes', function() {
         var router = new Router();
 
-        router.use('first', function(key, page, next) {
+        router.runStage('first', function(key, page, next) {
           page.routedToFirst = true;
           next();
         });
 
-        router.use('second', function(key, page, next) {
+        router.runStage('second', function(key, page, next) {
           page.routedToSecond = true;
           next();
         });
@@ -1284,7 +1284,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(key, page, next) {
             page.stageCalled = [ '1' ];
             next();
@@ -1338,7 +1338,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.stageCalled = [ 'a1' ];
             next();
@@ -1352,7 +1352,7 @@ describe('Router', function() {
             next();
           });
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           page.stageCalled.push('b1');
           next();
         });
@@ -1403,7 +1403,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           next();
         });
 
@@ -1429,7 +1429,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first', function(page, next) {
+        router.runStage('first', function(page, next) {
           next();
         });
 
@@ -1454,7 +1454,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.stageCalled = [ '1' ];
             next();
@@ -1508,7 +1508,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.stageCalled = [ '1' ];
             next(new Error('1 error'));
@@ -1561,7 +1561,7 @@ describe('Router', function() {
 
         var router = new Router();
 
-        router.use('first',
+        router.runStage('first',
           function(page, next) {
             page.stageCalled = [ '1' ];
             wtf

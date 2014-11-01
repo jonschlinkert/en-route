@@ -193,8 +193,8 @@ describe('Router', function(){
       var router = new Router();
       router.use.bind(router, '/', 'hello').should.throw(/requires middleware function.*string/)
       router.use.bind(router, '/', 5).should.throw(/requires middleware function.*number/)
-      router.use.bind(router, '/', null).should.throw(/requires middleware function.*Null/)
-      router.use.bind(router, '/', new Date()).should.throw(/requires middleware function.*Date/)
+      router.use.bind(router, '/', null).should.throw(/requires middleware function.*null/)
+      router.use.bind(router, '/', new Date()).should.throw(/requires middleware function.*date/)
     })
 
     it('should accept array of middleware', function(done){

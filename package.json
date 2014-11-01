@@ -54,6 +54,7 @@
     "verb-tag-jscomments": "^0.2.2"
   },
   "dependencies": {
+    "arr-flatten": "^0.2.0",
     "lodash": "^2.4.1",
     "path-to-regexp": "^0.2.3",
     "utils-merge": "^1.0.0"

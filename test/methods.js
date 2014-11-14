@@ -22,18 +22,18 @@ describe('methods', function(){
     var another = new Router({methods: ['before']});
 
     another.before('/:bar', function(file, next) {
-      file.params.bar.should.equal('route');
+      file.options.params.bar.should.equal('route');
       next();
     });
     router.use('/:foo', another);
 
-    router.handle({ path: '/test/route', method: 'before' }, done);
+    router.handle({ path: '/test/route', options: {method: 'before'} }, done);
   });
 
   describe('.handle', function(){
     it('should dispatch to methods', function(done){
       var router = new Router({methods: ['before']});
-      var file = { path: '/foo', method: 'before' };
+      var file = { path: '/foo', options: {method: 'before'} };
 
       router.route('/foo').before(function(file, next){
         file.content = 'foo';
@@ -96,7 +96,7 @@ describe('methods', function(){
         done();
       });
 
-      router.handle({ path: '/foo', method: 'before' }, done);
+      router.handle({ path: '/foo', options: {method: 'before'} }, done);
     });
 
     it('should handle throwing inside routes with params on a method', function(done) {
@@ -115,7 +115,7 @@ describe('methods', function(){
         done();
       });
 
-      router.handle({ path: '/foo/2', method: 'before' }, function() {});
+      router.handle({ path: '/foo/2', options: {method: 'before'} }, function() {});
     });
   });
 
@@ -129,17 +129,17 @@ describe('methods', function(){
       });
 
       router.before('/foo/:id/bar', function(file, next) {
-        assert.equal(file.params.id, '123');
+        assert.equal(file.options.params.id, '123');
         next();
       });
 
-      router.handle({ path: '/foo/123/bar', method: 'before' }, done);
+      router.handle({ path: '/foo/123/bar', options: {method: 'before'} }, done);
     });
 
 
     it('should only call once per request on a method', function(done) {
       var count = 0;
-      var file = { path: '/foo/bob/bar', method: 'before' };
+      var file = { path: '/foo/bob/bar', options: {method: 'before'} };
       var router = new Router({methods: ['before']});
       var sub = new Router({methods: ['before']});
 
@@ -166,7 +166,7 @@ describe('methods', function(){
 
     it('should call when values differ on a method', function(done) {
       var count = 0;
-      var file = { path: '/foo/bob/bar', method: 'before' };
+      var file = { path: '/foo/bob/bar', options: {method: 'before'} };
       var router = new Router({methods: ['before']});
       var sub = new Router({methods: ['before']});
 
@@ -194,8 +194,8 @@ describe('methods', function(){
 
   describe('parallel calls', function() {
     it('should not mix calls on a method', function(done) {
-      var file1 = { path: '/foo/50/bar', method: 'before' };
-      var file2 = { path: '/foo/10/bar', method: 'before' };
+      var file1 = { path: '/foo/50/bar', options: {method: 'before'} };
+      var file2 = { path: '/foo/10/bar', options: {method: 'before'} };
       var router = new Router({methods: ['before']});
       var sub = new Router({methods: ['before']});
 
@@ -217,14 +217,14 @@ describe('methods', function(){
       router.handle(file1, function(err) {
         assert.ifError(err);
         assert.equal(file1.ms, 50);
-        assert.equal(file1.originalPath, '/foo/50/bar');
+        assert.equal(file1.options.originalPath, '/foo/50/bar');
         done();
       });
 
       router.handle(file2, function(err) {
         assert.ifError(err);
         assert.equal(file2.ms, 10);
-        assert.equal(file2.originalPath, '/foo/10/bar');
+        assert.equal(file2.options.originalPath, '/foo/10/bar');
         done();
       });
     });

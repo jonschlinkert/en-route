@@ -34,7 +34,7 @@ describe('Router', function(){
     var another = new Router();
 
     another.all('/:bar', function(file, next) {
-      file.params.bar.should.equal('route');
+      file.options.params.bar.should.equal('route');
       next();
     });
     router.use('/:foo', another);
@@ -230,7 +230,7 @@ describe('Router', function(){
       });
 
       router.all('/foo/:id/bar', function(file, next) {
-        assert.equal(file.params.id, '123');
+        assert.equal(file.options.params.id, '123');
         next();
       });
 
@@ -246,7 +246,7 @@ describe('Router', function(){
       });
 
       router.use('/foo/:id/bar', function(file, next) {
-        assert.equal(file.params.id, '123');
+        assert.equal(file.options.params.id, '123');
         assert.equal(file.path, '/baz');
         next();
       });
@@ -334,14 +334,14 @@ describe('Router', function(){
       router.handle(file1, function(err) {
         assert.ifError(err);
         assert.equal(file1.ms, 50);
-        assert.equal(file1.originalPath, '/foo/50/bar');
+        assert.equal(file1.options.originalPath, '/foo/50/bar');
         done();
       });
 
       router.handle(file2, function(err) {
         assert.ifError(err);
         assert.equal(file2.ms, 10);
-        assert.equal(file2.originalPath, '/foo/10/bar');
+        assert.equal(file2.options.originalPath, '/foo/10/bar');
         done();
       });
     });

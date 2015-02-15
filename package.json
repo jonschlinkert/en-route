@@ -1,7 +1,7 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js and kerouac routes.",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
     "name": "Jon Schlinkert",
@@ -17,9 +17,30 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE-MIT"
+      "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE"
     }
   ],
+  "files": ["index.js", "lib/"],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "arr-flatten": "^0.2.0",
+    "array-slice": "^0.2.2",
+    "debug": "^1.0.4",
+    "kind-of": "^0.1.2",
+    "lodash": "^2.4.1",
+    "path-to-regexp": "^0.2.3",
+    "utils-merge": "^1.0.0"
+  },
+  "devDependencies": {
+    "after": "^0.8.1",
+    "should": "^4.1.0"
+  },
   "keywords": [
     "app",
     "assemble",
@@ -39,27 +60,5 @@
     "static",
     "task",
     "tasks"
-  ],
-  "main": "index.js",
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "scripts": {
-    "test": "mocha -R spec"
-  },
-  "devDependencies": {
-    "after": "^0.8.1",
-    "should": "^4.1.0",
-    "verb": ">= 0.2.6",
-    "verb-tag-jscomments": "^0.2.2"
-  },
-  "dependencies": {
-    "arr-flatten": "^0.2.0",
-    "array-slice": "^0.2.2",
-    "debug": "^1.0.4",
-    "kind-of": "^0.1.2",
-    "lodash": "^2.4.1",
-    "path-to-regexp": "^0.2.3",
-    "utils-merge": "^1.0.0"
-  }
+  ]
 }

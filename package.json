@@ -1,6 +1,6 @@
 {
   "name": "en-route",
-  "description": "Routing for static site generators, build systems and task runners, heavily based on express.js and kerouac routes.",
+  "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
   "version": "0.4.0",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
@@ -14,13 +14,14 @@
   "bugs": {
     "url": "https://github.com/jonschlinkert/en-route/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE"
-    }
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE"
+  },
+  "files": [
+    "index.js",
+    "lib/"
   ],
-  "files": ["index.js", "lib/"],
   "main": "index.js",
   "engines": {
     "node": ">=0.10.0"
@@ -32,6 +33,7 @@
     "arr-flatten": "^0.2.0",
     "array-slice": "^0.2.2",
     "debug": "^1.0.4",
+    "helper-related": "^0.1.0",
     "kind-of": "^0.1.2",
     "lodash": "^2.4.1",
     "path-to-regexp": "^0.2.3",
@@ -39,7 +41,7 @@
   },
   "devDependencies": {
     "after": "^0.8.1",
-    "should": "^4.1.0"
+    "should": "^5.0.1"
   },
   "keywords": [
     "app",
@@ -60,5 +62,15 @@
     "static",
     "task",
     "tasks"
+  ],
+  "authors": [
+    {
+      "name": "Jon Schlinkert",
+      "username": "jonschlinkert"
+    },
+    {
+      "name": "Brian Woodward",
+      "username": "doowb"
+    }
   ]
 }

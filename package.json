@@ -1,12 +1,22 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
     "name": "Jon Schlinkert",
     "url": "https://github.com/jonschlinkert"
   },
+  "maintainers": [
+    {
+      "name": "Jon Schlinkert",
+      "username": "jonschlinkert"
+    },
+    {
+      "name": "Brian Woodward",
+      "username": "doowb"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/jonschlinkert/en-route.git"
@@ -61,15 +71,5 @@
     "static",
     "task",
     "tasks"
-  ],
-  "authors": [
-    {
-      "name": "Jon Schlinkert",
-      "username": "jonschlinkert"
-    },
-    {
-      "name": "Brian Woodward",
-      "username": "doowb"
-    }
   ]
 }

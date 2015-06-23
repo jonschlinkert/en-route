@@ -1,7 +1,7 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": {
     "name": "Jon Schlinkert",
@@ -24,10 +24,7 @@
   "bugs": {
     "url": "https://github.com/jonschlinkert/en-route/issues"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/jonschlinkert/en-route/blob/master/LICENSE"
-  },
+  "license": "MIT",
   "files": [
     "index.js",
     "lib/"
@@ -41,10 +38,10 @@
   },
   "dependencies": {
     "arr-flatten": "^1.0.1",
-    "debug": "^2.1.3",
-    "extend-shallow": "^1.1.2",
-    "kind-of": "^1.1.0",
-    "path-to-regexp": "^1.0.3"
+    "debug": "^2.2.0",
+    "extend-shallow": "^1.1.4",
+    "kind-of": "^2.0.0",
+    "path-to-regexp": "^0.1.6"
   },
   "devDependencies": {
     "after": "^0.8.1",

@@ -1,38 +1,43 @@
-# en-route [![NPM version](https://badge.fury.io/js/en-route.svg)](http://badge.fury.io/js/en-route)  [![Build Status](https://travis-ci.org/jonschlinkert/en-route.svg)](https://travis-ci.org/jonschlinkert/en-route) 
+# en-route [![NPM version](https://badge.fury.io/js/en-route.svg)](http://badge.fury.io/js/en-route)  [![Build Status](https://travis-ci.org/jonschlinkert/en-route.svg)](https://travis-ci.org/jonschlinkert/en-route)
 
 > Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.
 
-## Install with [npm](npmjs.org)
+Install with [npm](https://www.npmjs.com/)
 
-```bash
-npm i en-route --save
+```sh
+$ npm i en-route --save
 ```
 
 ## API
-### [Router](./lib/index.js#L23)
 
-* **{Object}**: options    
-* `returns` **{Router}**: which is an callable function  
+### [Router](lib/index.js#L23)
 
 Initialize a new `Router` with the given `options`.
 
-### [.param](./lib/index.js#L82)
+**Params**
+
+* **{Object}**: options
+* `returns` **{Router}**: which is an callable function
+
+### [.param](lib/index.js#L82)
 
 Map the given param placeholder `name`(s) to the given callback.
-
-* `name` **{String}**    
-* `fn` **{Function}**    
-* `returns` **{Router}** `Object`: for chaining  
 
 Parameter mapping is used to provide pre-conditions to routes
 which use normalized placeholders. For example a `:user_id` parameter
 could automatically load a user's information from the database without
 any additional code,
-
 The callback uses the same signature as middleware, the only difference
 being that the value of the placeholder is passed, in this case the _id_
+
 of the user. Once the `next()` function is invoked, just like middleware
 it will continue on to execute the route, or subsequent parameter functions.
+
+**Params**
+
+* `name` **{String}**
+* `fn` **{Function}**
+* `returns` **{Router}** `Object`: for chaining
 
 **Example**
 
@@ -50,16 +55,18 @@ app.param('user_id', function(file, next, id) {
 });
 ```
 
-### [.use](./lib/index.js#L387)
+### [.use](lib/index.js#L386)
 
 Use the given middleware function, with optional path, defaulting to `/`.
-
-* `fn` **{Function}**    
 
 The other difference is that _route_ path is stripped and not visible
 to the handler function. The main effect of this feature is that mounted
 handlers can operate without any code changes regardless of the `prefix`
 pathname.
+
+**Params**
+
+* `fn` **{Function}**
 
 **Example**
 
@@ -72,33 +79,34 @@ router.use(function (file, next) {
 });
 ```
 
-### [.route](./lib/index.js#L446)
+### [.route](lib/index.js#L445)
 
 Create a new Route for the given path.
-
-* `path` **{String}**    
-* `returns` **{Object}** `Route`: for chaining  
 
 Each route contains a separate middleware stack.
 
 See the Route api documentation for details on adding handlers
 and middleware to routes.
 
+**Params**
 
+* `path` **{String}**
+* `returns` **{Object}** `Route`: for chaining
 
-
-
-### [.all](./lib/route.js#L114)
+### [.all](lib/route.js#L114)
 
 Add a handler for all methods to this route.
 
-* `handler` **{Function}**    
-* `returns` **{Object}** `Route`: for chaining  
-
 Behaves just like middleware and can respond or call `next`
 to continue processing.
-
 You can use multiple `.all` call to add multiple handlers.
+
+**Params**
+
+* `handler` **{Function}**
+* `returns` **{Object}** `Route`: for chaining
+
+**Example**
 
 ```js
 function checkSomething(file, next) {
@@ -117,36 +125,34 @@ route
   });
 ```
 
-
-
 ## Related
+
+* [assemble](http://assemble.io): Static site generator for Grunt.js, Yeoman and Node.js. Used by Zurb Foundation, Zurb Ink, H5BP/Effeckt,… [more](http://assemble.io)
 * [gulp-routes](https://github.com/assemble/gulp-routes): Add middleware to run for specified routes in your gulp pipeline.
-* [assemble](http://assemble.io): Static site generator for Grunt.js, Yeoman and Node.js. Used by Zurb Foundation, Zurb Ink, H5BP/Effeckt, Less.js / lesscss.org, Topcoat, Web Experience Toolkit, and hundreds of other projects to build sites, themes, components, documentation, blogs and gh
-* [verb](https://github.com/assemble/verb): Verb makes it dead simple to generate markdown documentation, using simple templates, with zero configuration required. A project without documentation is like a project that doesn't exist.
-* [template](https://github.com/jonschlinkert/template): Render templates from any engine. Make custom template types, use layouts on pages, partials or any custom template type, custom delimiters, helpers, middleware, routes, loaders, and lots more. Powers Assemble v0.6.0, Verb v0.3.0 and your application.
+* [template](https://github.com/jonschlinkert/template): Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template… [more](https://github.com/jonschlinkert/template)
+* [verb](https://github.com/assemble/verb): Documentation generator for GitHub projects. Extremely powerful, easy to use, can generate anything from API… [more](https://github.com/assemble/verb)
 
 ## Authors
- 
-**Jon Schlinkert**
- 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert) 
- 
-**Brian Woodward**
- 
-+ [github/doowb](https://github.com/doowb)
-+ [twitter/doowb](http://twitter.com/doowb) 
 
+**Jon Schlinkert**
+
++ [github/jonschlinkert](https://github.com/jonschlinkert)
++ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+
+**Brian Woodward**
+
+* [github/doowb](https://github.com/doowb)
+* [twitter/doowb](http://twitter.com/doowb)
 
 ## License
-Copyright (c) 2015 Jon Schlinkert  
-Released under the MIT license
+
+Copyright © 2015 Jon Schlinkert
+Released under the MIT license.
 
 Based on previous work by:
-Copyright (c) 2009-2014 TJ Holowaychuk <tj@vision-media.ca>
-Copyright (c) 2012-2013 Jared Hanson <http://jaredhanson.net/>
+Copyright (c) 2009-2014 TJ Holowaychuk [tj@vision-media.ca](mailto:tj@vision-media.ca)
+Copyright (c) 2012-2013 Jared Hanson [http://jaredhanson.net/](http://jaredhanson.net/)
 
 ***
 
-_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on March 14, 2015._
-<!-- deps:extend-shallow arr-flatten kind-of -->
+_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on June 23, 2015._

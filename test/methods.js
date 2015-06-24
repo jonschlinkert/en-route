@@ -16,6 +16,21 @@ describe('methods', function(){
     assert(typeof router.after == 'function');
   });
 
+  it('should return a Router with specific original methods then allow adding additional methods', function() {
+    var options = {
+      methods: ['before', 'after']
+    };
+    var router = Router(options);
+    assert(typeof router == 'function');
+    assert(typeof router.all == 'function');
+    assert(typeof router.before == 'function');
+    assert(typeof router.after == 'function');
+    assert(typeof router.additional == 'undefined');
+
+    router.method('additional');
+    assert(typeof router.additional == 'function');
+  });
+
   it('should support dynamic routes on methods', function(done) {
     var router = new Router({methods: ['before']});
     var another = new Router({methods: ['before']});
@@ -35,6 +50,22 @@ describe('methods', function(){
       var file = { path: '/foo', options: {method: 'before'} };
 
       router.route('/foo').before(function(file, next){
+        file.content = 'foo';
+        next();
+      });
+
+      router.handle(file, function (err) {
+        file.content.should.equal('foo');
+        done();
+      });
+    });
+
+    it('should dispatch to dynamic methods', function(done){
+      var router = new Router({methods: ['before']});
+      router.method('additional');
+      var file = { path: '/foo', options: {method: 'additional'} };
+
+      router.route('/foo').additional(function(file, next){
         file.content = 'foo';
         next();
       });

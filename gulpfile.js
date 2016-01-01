@@ -12,18 +12,15 @@ gulp.task('coverage', function() {
 });
 
 gulp.task('mocha', ['coverage'], function() {
-  return gulp.src('test/*.js')
+  return gulp.src(['test/*.js'])
     .pipe(mocha())
-    .pipe(istanbul.writeReports({
-      reporters: ['html', 'text', 'text-summary'],
-      reportOpts: {dir: 'coverage', file: 'summary.txt'}
-    }));
+    .pipe(istanbul.writeReports());
 });
 
 gulp.task('eslint', function() {
-  return gulp.src(['*.js', 'lib/*', 'test/*.js'])
+  return gulp.src(['*.js', 'lib/*.js', 'test/*.js'])
     .pipe(eslint())
     .pipe(eslint.format());
 });
 
-gulp.task('default', ['mocha', 'eslint']);
+gulp.task('default', ['eslint', 'mocha']);

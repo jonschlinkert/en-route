@@ -3,19 +3,10 @@
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
   "version": "0.7.3",
   "homepage": "https://github.com/jonschlinkert/en-route",
-  "author": {
-    "name": "Jon Schlinkert",
-    "url": "https://github.com/jonschlinkert"
-  },
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "maintainers": [
-    {
-      "name": "Jon Schlinkert",
-      "username": "jonschlinkert"
-    },
-    {
-      "name": "Brian Woodward",
-      "username": "doowb"
-    }
+    "Brian Woodward",
+    "Jon Schlinkert"
   ],
   "repository": "jonschlinkert/en-route",
   "bugs": {
@@ -43,8 +34,8 @@
   },
   "devDependencies": {
     "after": "^0.8.1",
-    "mocha": "^2.2.5",
-    "should": "^5.0.1",
+    "mocha": "*",
+    "should": "*",
     "time-require": "jonschlinkert/time-require"
   },
   "keywords": [
@@ -66,5 +57,15 @@
     "static",
     "task",
     "tasks"
-  ]
+  ],
+  "verb": {
+    "related": {
+      "list": [
+        "assemble",
+        "gulp-routes",
+        "template",
+        "verb"
+      ]
+    }
+  }
 }

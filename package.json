@@ -33,10 +33,8 @@
     "arr-union": "^3.1.0",
     "async-array-reduce": "^0.2.1",
     "debug": "^2.6.8",
-    "extend-shallow": "^2.0.1",
+    "define-property": "^1.0.0",
     "isobject": "^3.0.0",
-    "kind-of": "^5.0.0",
-    "lazy-cache": "^2.0.2",
     "path-to-regexp": "^1.7.0",
     "typeof-article": "^0.1.1"
   },

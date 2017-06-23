@@ -122,14 +122,13 @@ describe('Router', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
+      router.handle({
+        path: '/foo'
+      }, function(err) {
+        assert(err);
         assert.equal(err.message, 'foo');
         cb();
       });
-
-      router.handle({
-        path: '/foo'
-      }, cb);
     });
 
     it('should handle throwing inside routes with params', function(cb) {
@@ -143,14 +142,12 @@ describe('Router', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
+      router.handle({
+        path: '/foo/2'
+      }, function(err) {
         assert.equal(err.message, 'arbitrary');
         cb();
       });
-
-      router.handle({
-        path: '/foo/2'
-      }, function() {});
     });
 
     it('should handle throwing in handler after async param', function(cb) {
@@ -167,14 +164,12 @@ describe('Router', function() {
         throw new Error('oh no!');
       });
 
-      router.use(function(err, file, next) {
+      router.handle({
+        path: '/bob'
+      }, function(err) {
         assert.equal(err.message, 'oh no!');
         cb();
       });
-
-      router.handle({
-        path: '/bob'
-      }, function() {});
     });
 
     it('should handle throwing inside error handlers', function(cb) {
@@ -184,29 +179,19 @@ describe('Router', function() {
         throw new Error('boom!');
       });
 
-      router.use(function(err, file, next) {
-        throw new Error('oops');
-      });
-
-      router.use(function(err, file, next) {
-        assert.equal(err.message, 'oops');
+      router.handle({path: '/'}, function(err) {
+        assert.equal(err.message, 'boom!');
         cb();
       });
-
-      router.handle({path: '/'}, cb);
     });
   });
 
   describe('.use', function() {
-    it('should require arguments', function(cb) {
+    it('should require arguments', function() {
       var router = new Router();
-      try {
+      assert.throws(function() {
         router.use.bind(router)();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(/expected middleware functions to be defined/.test(err.message));
-        cb();
-      }
+      });
     });
 
     it('should not accept non-functions', function() {

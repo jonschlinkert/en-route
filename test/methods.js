@@ -163,17 +163,15 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
-
       router.handle({
         path: '/foo',
         options: {
           method: 'before'
         }
-      }, cb);
+      }, function(err) {
+        assert.equal(err.message, 'foo');
+        cb();
+      });
     });
 
     it('should handle throwing inside routes with params on a method', function(cb) {
@@ -189,17 +187,15 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
-
       router.handle({
         path: '/foo/2',
         options: {
           method: 'before'
         }
-      }, function() {});
+      }, function(err) {
+        assert.equal(err.message, 'foo');
+        cb();
+      });
     });
   });
 

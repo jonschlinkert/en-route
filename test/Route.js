@@ -164,7 +164,7 @@ describe('with parameterized path', function() {
     assert.equal(route.stack.length, 1);
   });
 
-  // it('should match correctly', function () {
+  // it('should match correctly', function() {
   //   assert(route.match('/blog/2015/04/18/hello-world'));
   //   assert(route.params && typeof route.params === 'object');
   //   assert.equal(Object.keys(route.params).length, 4);

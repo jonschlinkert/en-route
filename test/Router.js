@@ -1,18 +1,18 @@
-var enRoute = require('../');
+'use strict';
+
+var Router = require('../');
 var after = require('after');
-var Router = enRoute.Router;
 var assert = require('assert');
 
 describe('Router', function() {
   it('should return a function with router methods', function() {
     var router = Router();
-    assert(typeof router === 'function');
+    assert.equal(typeof router, 'function');
 
     var router = new Router();
-    assert(typeof router === 'function');
-
-    assert(typeof router.handle === 'function');
-    assert(typeof router.use === 'function');
+    assert.equal(typeof router, 'function');
+    assert.equal(typeof router.handle, 'function');
+    assert.equal(typeof router.use, 'function');
   });
 
   it('should support .use of other routers', function(cb) {
@@ -39,12 +39,11 @@ describe('Router', function() {
     });
 
     router.use('/:foo', another);
-    router.handle({
-      path: '/test/route'
-    }, cb);
+    var file = {path: '/test/route'};
+    router.handle(file, cb);
   });
 
-  xit('should handle blank path', function(cb) {
+  it('should handle blank path', function(cb) {
     var router = new Router();
 
     router.use(function(file, next) {
@@ -52,9 +51,7 @@ describe('Router', function() {
       next();
     });
 
-    router.handle({
-      path: ''
-    }, cb);
+    router.handle({path: ''}, cb);
   });
 
   describe('.handle', function() {
@@ -64,10 +61,11 @@ describe('Router', function() {
         path: '/foo'
       };
 
-      router.route('/foo').all(function(file, next) {
-        file.content = 'foo';
-        next();
-      });
+      router.route('/foo')
+        .all(function(file, next) {
+          file.content = 'foo';
+          next();
+        });
 
       router.handle(file, function(err) {
         assert.equal(file.content, 'foo');
@@ -81,14 +79,14 @@ describe('Router', function() {
       assert.throws(function() {
         var router = new Router();
         router.route('/foo').all(null);
-      });
+      }, /null/);
     });
 
     it('should throw if a callback is undefined', function() {
       assert.throws(function() {
         var router = new Router();
         router.route('/foo').all(undefined);
-      });
+      }, /undefined/);
     });
 
     it('should throw if a callback is not a function', function() {
@@ -138,7 +136,7 @@ describe('Router', function() {
       var router = new Router();
 
       router.all('/foo/:id', function(file, next) {
-        throw new Error('foo');
+        throw new Error('arbitrary');
       });
 
       router.use(function(file, next) {
@@ -146,7 +144,7 @@ describe('Router', function() {
       });
 
       router.use(function(err, file, next) {
-        assert.equal(err.message, 'foo');
+        assert.equal(err.message, 'arbitrary');
         cb();
       });
 
@@ -195,9 +193,7 @@ describe('Router', function() {
         cb();
       });
 
-      router.handle({
-        path: '/'
-      }, cb);
+      router.handle({path: '/'}, cb);
     });
   });
 
@@ -228,14 +224,14 @@ describe('Router', function() {
       } catch (err) {
         assert(/expected callback to be a function.*number/.test(err.message));
       }
-      
+
       try {
         router.use.bind(router, '/', null)();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(/expected callback to be a function.*null/.test(err.message));
       }
-      
+
       try {
         router.use.bind(router, '/', new Date())();
         cb(new Error('expected an error'));
@@ -266,7 +262,8 @@ describe('Router', function() {
 
       router.handle({
         path: '/foo'
-      }, function() {});
+      }, function() {
+      });
     });
   });
 

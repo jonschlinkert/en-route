@@ -11,25 +11,26 @@ describe('methods', function() {
       methods: ['before', 'after']
     };
     var router = Router(options);
-    assert(typeof router === 'function');
-    assert(typeof router.all === 'function');
-    assert(typeof router.before === 'function');
-    assert(typeof router.after === 'function');
+    assert.equal(typeof router, 'function');
+    assert.equal(typeof router.all, 'function');
+    assert.equal(typeof router.before, 'function');
+    assert.equal(typeof router.after, 'function');
   });
 
   it('should return a Router with specific original methods then allow adding additional methods', function() {
     var options = {
       methods: ['before', 'after']
     };
+
     var router = Router(options);
-    assert(typeof router === 'function');
-    assert(typeof router.all === 'function');
-    assert(typeof router.before === 'function');
-    assert(typeof router.after === 'function');
-    assert(typeof router.additional === 'undefined');
+    assert.equal(typeof router, 'function');
+    assert.equal(typeof router.all, 'function');
+    assert.equal(typeof router.before, 'function');
+    assert.equal(typeof router.after, 'function');
+    assert.equal(typeof router.additional, 'undefined');
 
     router.method('additional');
-    assert(typeof router.additional === 'function');
+    assert.equal(typeof router.additional, 'function');
   });
 
   it('should support dynamic routes on methods', function(cb) {

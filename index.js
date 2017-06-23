@@ -1,13 +1,16 @@
 'use strict';
 
-/**
- * Some of this code was originally from [expressjs](https://github.com/strongloop/express)
- * Copyright (c) 2009-2014 TJ Holowaychuk <tj@vision-media.ca>
+/*!
+ * en-route <https://github.com/jonschlinkert/en-route>
+ *
+ * Copyright (c) 2009-2014, 2017, Jon Schlinkert.
+ * Released under the MIT License.
  */
 
 var Route = require('./lib/route');
 var Router = require('./lib');
 
+module.exports = Router;
 module.exports.Route = Route;
 module.exports.Router = Router;
 

@@ -8,6 +8,10 @@
     "Brian Woodward",
     "Jon Schlinkert"
   ],
+  "contributors": [
+    "Brian Woodward (https://twitter.com/doowb)",
+    "Jon Schlinkert (http://twitter.com/jonschlinkert)"
+  ],
   "repository": "jonschlinkert/en-route",
   "bugs": {
     "url": "https://github.com/jonschlinkert/en-route/issues"
@@ -15,7 +19,7 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "lib/"
+    "lib"
   ],
   "main": "index.js",
   "engines": {
@@ -25,25 +29,29 @@
     "test": "mocha"
   },
   "dependencies": {
-    "arr-flatten": "^1.0.1",
-    "debug": "^2.2.0",
+    "arr-flatten": "^1.0.3",
+    "arr-union": "^3.1.0",
+    "async-each-series": "^1.1.0",
+    "debug": "^2.6.8",
     "extend-shallow": "^2.0.1",
-    "kind-of": "^3.0.2",
-    "lazy-cache": "^1.0.3",
-    "path-to-regexp": "^1.2.1"
+    "isobject": "^3.0.0",
+    "kind-of": "^5.0.0",
+    "lazy-cache": "^2.0.2",
+    "path-to-regexp": "^1.7.0",
+    "typeof-article": "^0.1.1"
   },
   "devDependencies": {
-    "after": "^0.8.1",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-format-md": "^0.1.4",
-    "gulp-istanbul": "^0.10.3",
-    "gulp-mocha": "^2.2.0",
-    "mocha": "*"
+    "after": "^0.8.2",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^3.0.1",
+    "gulp-istanbul": "^1.1.2",
+    "gulp-eslint": "^4.0.0",
+    "gulp-format-md": "^0.1.12"
   },
   "keywords": [
     "app",
     "assemble",
+    "en",
     "express",
     "file",
     "filepath",

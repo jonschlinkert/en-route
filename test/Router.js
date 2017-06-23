@@ -209,36 +209,20 @@ describe('Router', function() {
       }
     });
 
-    it('should not accept non-functions', function(cb) {
+    it('should not accept non-functions', function() {
       var router = new Router();
-      try {
+      assert.throws(function() {
         router.use.bind(router, '/', 'hello')();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(/expected callback to be a function.*string/.test(err.message));
-      }
-
-      try {
+      });
+      assert.throws(function() {
         router.use.bind(router, '/', 5)();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(/expected callback to be a function.*number/.test(err.message));
-      }
-
-      try {
+      });
+      assert.throws(function() {
         router.use.bind(router, '/', null)();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(/expected callback to be a function.*null/.test(err.message));
-      }
-
-      try {
+      });
+      assert.throws(function() {
         router.use.bind(router, '/', new Date())();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(/expected callback to be a function.*date/.test(err.message));
-      }
-      cb();
+      });
     });
 
     it('should accept array of middleware', function(cb) {

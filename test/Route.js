@@ -46,7 +46,7 @@ describe('Route', function() {
 
   describe('errors', function() {
     it('should handle errors via arity 3 functions', function(cb) {
-      var file = {order: '', path: '/'};
+      var file = {path: '/'};
       var route = new Route('');
 
       route.all(function(file, next) {
@@ -54,25 +54,22 @@ describe('Route', function() {
       });
 
       route.all(function(file, next) {
-        file.order += '0';
         next();
       });
 
       route.all(function(err, file, next) {
-        file.order += 'a';
         next(err);
       });
 
       route.dispatch(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
-        assert.equal(file.order, 'a');
         cb();
       });
     });
 
     it('should handle throw', function(cb) {
-      var file = {order: '', path: '/'};
+      var file = {path: '/'};
       var route = new Route('');
 
       route.all(function(file, next) {
@@ -80,43 +77,12 @@ describe('Route', function() {
       });
 
       route.all(function(file, next) {
-        file.order += '0';
         next();
-      });
-
-      route.all(function(err, file, next) {
-        file.order += 'a';
-        next(err);
       });
 
       route.dispatch(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
-        assert.equal(file.order, 'a');
-        cb();
-      });
-    });
-
-    it('should handle throwing inside error handlers', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('');
-
-      route.all(function(file, next) {
-        throw new Error('boom!');
-      });
-
-      route.all(function(err, file, next) {
-        throw new Error('oops');
-      });
-
-      route.all(function(err, file, next) {
-        file.message = err.message;
-        next();
-      });
-
-      route.dispatch(file, function(err) {
-        if (err) return cb(err);
-        assert.equal(file.message, 'oops');
         cb();
       });
     });

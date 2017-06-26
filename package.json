@@ -8,6 +8,10 @@
     "Brian Woodward",
     "Jon Schlinkert"
   ],
+  "authors": [
+    "Brian Woodward (https://twitter.com/doowb)",
+    "Jon Schlinkert (http://twitter.com/jonschlinkert)"
+  ],
   "contributors": [
     "Brian Woodward (https://twitter.com/doowb)",
     "Jon Schlinkert (http://twitter.com/jonschlinkert)"
@@ -34,40 +38,43 @@
     "async-array-reduce": "^0.2.1",
     "debug": "^2.6.8",
     "define-property": "^1.0.0",
-    "isobject": "^3.0.0",
     "path-to-regexp": "^1.7.0",
     "typeof-article": "^0.1.1"
   },
   "devDependencies": {
     "after": "^0.8.2",
     "gulp": "^3.9.1",
-    "gulp-mocha": "^3.0.1",
-    "gulp-istanbul": "^1.1.2",
     "gulp-eslint": "^4.0.0",
-    "gulp-format-md": "^0.1.12"
+    "gulp-format-md": "^0.1.12",
+    "gulp-istanbul": "^1.1.2",
+    "gulp-mocha": "^3.0.1",
+    "mocha": "^3.4.2"
   },
   "keywords": [
-    "app",
     "assemble",
-    "en",
     "express",
-    "file",
-    "filepath",
-    "kerouac",
     "middleware",
+    "handlers",
+    "dispatch",
+    "match",
+    "matchers",
     "path",
     "regex",
     "regexp",
     "route",
     "router",
     "routes",
-    "routing",
-    "site",
-    "static",
-    "task",
-    "tasks"
+    "routing"
   ],
   "verb": {
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
         "assemble",
@@ -76,8 +83,8 @@
         "verb"
       ]
     },
-    "plugins": [
-      "gulp-format-md"
-    ]
+    "lint": {
+      "reflinks": true
+    }
   }
 }

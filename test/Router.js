@@ -57,9 +57,7 @@ describe('Router', function() {
   describe('.handle', function() {
     it('should dispatch', function(cb) {
       var router = new Router();
-      var file = {
-        path: '/foo'
-      };
+      var file = {path: '/foo'};
 
       router.route('/foo')
         .all(function(file, next) {
@@ -118,9 +116,7 @@ describe('Router', function() {
         assert(false);
       });
 
-      router.handle({
-        path: '/foo'
-      }, function(err) {
+      router.handle({path: '/foo'}, function(err) {
         assert(err);
         assert.equal(err.message, 'foo');
         cb();
@@ -138,9 +134,7 @@ describe('Router', function() {
         assert(false);
       });
 
-      router.handle({
-        path: '/foo/2'
-      }, function(err) {
+      router.handle({path: '/foo/2'}, function(err) {
         assert.equal(err.message, 'arbitrary');
         cb();
       });
@@ -265,16 +259,12 @@ describe('Router', function() {
         next();
       });
 
-      router.handle({
-        path: '/foo/123/bar/baz'
-      }, cb);
+      router.handle({path: '/foo/123/bar/baz'}, cb);
     });
 
     it('should only call once per request', function(cb) {
       var count = 0;
-      var file = {
-        path: '/foo/bob/bar'
-      };
+      var file = {path: '/foo/bob/bar'};
       var router = new Router();
       var sub = new Router();
 
@@ -301,9 +291,7 @@ describe('Router', function() {
 
     it('should call when values differ', function(cb) {
       var count = 0;
-      var file = {
-        path: '/foo/bob/bar'
-      };
+      var file = {path: '/foo/bob/bar'};
       var router = new Router();
       var sub = new Router();
 

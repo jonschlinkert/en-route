@@ -75,34 +75,30 @@ describe('Router', function() {
   });
 
   describe('.multiple callbacks', function() {
-    it('should throw if a callback is null', function() {
+    it('should throw if a callback is not a function', function() {
       assert.throws(function() {
         var router = new Router();
         router.route('/foo').all(null);
-      }, /null/);
-    });
-
-    it('should throw if a callback is undefined', function() {
+      });
       assert.throws(function() {
         var router = new Router();
         router.route('/foo').all(undefined);
-      }, /undefined/);
-    });
-
-    it('should throw if a callback is not a function', function() {
+      });
       assert.throws(function() {
         var router = new Router();
         router.route('/foo').all('not a function');
       });
     });
 
-    it('should not throw if all callbacks are functions', function() {
+    it('should support chained calls', function() {
       var router = new Router();
-      router.route('/foo').all(function(file, next) {
-        next();
-      }).all(function(file, next) {
-        next();
-      });
+      router.route('/foo')
+        .all(function(file, next) {
+          next();
+        })
+        .all(function(file, next) {
+          next();
+        });
     });
   });
 

@@ -4,9 +4,17 @@
   "version": "0.7.5",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "authors": [
+    "Brian Woodward (https://twitter.com/doowb)",
+    "Jon Schlinkert (http://twitter.com/jonschlinkert)"
+  ],
   "maintainers": [
     "Brian Woodward",
     "Jon Schlinkert"
+  ],
+  "contributors": [
+    "Brian Woodward (https://twitter.com/doowb)",
+    "Jon Schlinkert (http://twitter.com/jonschlinkert)"
   ],
   "repository": "jonschlinkert/en-route",
   "bugs": {
@@ -15,39 +23,41 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "lib/"
+    "lib"
   ],
   "main": "index.js",
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4"
   },
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
-    "arr-flatten": "^1.0.1",
-    "debug": "^2.2.0",
-    "extend-shallow": "^2.0.1",
-    "kind-of": "^3.0.2",
-    "lazy-cache": "^1.0.3",
-    "path-to-regexp": "^1.2.1"
+    "arr-flatten": "^1.0.3",
+    "arr-union": "^3.1.0",
+    "async-array-reduce": "^0.2.1",
+    "debug": "^2.6.8",
+    "define-property": "^1.0.0",
+    "path-to-regexp": "^1.7.0",
+    "typeof-article": "^0.1.1"
   },
   "devDependencies": {
-    "after": "^0.8.1",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-format-md": "^0.1.4",
-    "gulp-istanbul": "^0.10.3",
-    "gulp-mocha": "^2.2.0",
-    "mocha": "*"
+    "after": "^0.8.2",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.0",
+    "gulp-format-md": "^0.1.12",
+    "gulp-istanbul": "^1.1.2",
+    "gulp-mocha": "^3.0.1",
+    "mocha": "^3.4.2"
   },
   "keywords": [
-    "app",
     "assemble",
+    "dispatch",
+    "en",
     "express",
-    "file",
-    "filepath",
-    "kerouac",
+    "handlers",
+    "match",
+    "matchers",
     "middleware",
     "path",
     "regex",
@@ -55,13 +65,17 @@
     "route",
     "router",
     "routes",
-    "routing",
-    "site",
-    "static",
-    "task",
-    "tasks"
+    "routing"
   ],
   "verb": {
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
         "assemble",
@@ -70,8 +84,8 @@
         "verb"
       ]
     },
-    "plugins": [
-      "gulp-format-md"
-    ]
+    "lint": {
+      "reflinks": true
+    }
   }
 }

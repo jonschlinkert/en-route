@@ -1,8 +1,8 @@
 'use strict';
 
 var assert = require('assert');
-var enRoute = require('..');
-var Route = enRoute.Route;
+var Router = require('..');
+var Route = Router.Route;
 
 describe('Route', function() {
   describe('.all', function() {
@@ -46,7 +46,7 @@ describe('Route', function() {
 
   describe('errors', function() {
     it('should handle errors via arity 3 functions', function(cb) {
-      var file = {order: '', path: '/'};
+      var file = {path: '/'};
       var route = new Route('');
 
       route.all(function(file, next) {
@@ -54,25 +54,18 @@ describe('Route', function() {
       });
 
       route.all(function(file, next) {
-        file.order += '0';
         next();
-      });
-
-      route.all(function(err, file, next) {
-        file.order += 'a';
-        next(err);
       });
 
       route.dispatch(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
-        assert.equal(file.order, 'a');
         cb();
       });
     });
 
     it('should handle throw', function(cb) {
-      var file = {order: '', path: '/'};
+      var file = {path: '/'};
       var route = new Route('');
 
       route.all(function(file, next) {
@@ -80,43 +73,12 @@ describe('Route', function() {
       });
 
       route.all(function(file, next) {
-        file.order += '0';
         next();
-      });
-
-      route.all(function(err, file, next) {
-        file.order += 'a';
-        next(err);
       });
 
       route.dispatch(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
-        assert.equal(file.order, 'a');
-        cb();
-      });
-    });
-
-    it('should handle throwing inside error handlers', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('');
-
-      route.all(function(file, next) {
-        throw new Error('boom!');
-      });
-
-      route.all(function(err, file, next) {
-        throw new Error('oops');
-      });
-
-      route.all(function(err, file, next) {
-        file.message = err.message;
-        next();
-      });
-
-      route.dispatch(file, function(err) {
-        if (err) return cb(err);
-        assert.equal(file.message, 'oops');
         cb();
       });
     });
@@ -135,45 +97,21 @@ describe('Route', function() {
         cb();
       });
     });
+  });
 
-    it('should handle single error handler', function(cb) {
-      var file = {method: 'GET', path: '/'};
-      var route = new Route('');
+  describe('with parameterized path', function() {
+    var route = new Route('/blog/:year/:month/:day/:slug').all([
+      function() {}
+    ]);
 
-      route.all(function(err, file, next) {
-        // this should not execute
-        cb(new Error('expected route.all to not execute'));
-      });
+    it('should have path property', function() {
+      assert.equal(route.path, '/blog/:year/:month/:day/:slug');
+    });
 
-      route.dispatch(file, cb);
+    it('should have stack property', function() {
+      assert(Array.isArray(route.stack));
+      assert.equal(route.stack.length, 1);
     });
   });
 });
 
-describe('with parameterized path', function() {
-  var route = new Route('/blog/:year/:month/:day/:slug').all([
-    function() {}
-  ]);
-
-  it('should have path property', function() {
-    assert.equal(route.path, '/blog/:year/:month/:day/:slug');
-  });
-
-  it('should have stack property', function() {
-    assert(Array.isArray(route.stack));
-    assert.equal(route.stack.length, 1);
-  });
-
-  // it('should match correctly', function () {
-  //   assert(route.match('/blog/2015/04/18/hello-world'));
-  //   assert(route.params && typeof route.params === 'object');
-  //   assert.equal(Object.keys(route.params).length, 4);
-  //   assert.equal(route.params.year, '2015');
-  //   assert.equal(route.params.month, '04');
-  //   assert.equal(route.params.day, '18');
-  //   assert.equal(route.params.slug, 'hello-world');
-
-  //   assert(!route.match('/blog/2015/04/18'));
-  //   assert(!route.match('/not-blog/2015/04/18/hello-world'));
-  // });
-});

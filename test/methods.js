@@ -10,26 +10,27 @@ describe('methods', function() {
     var options = {
       methods: ['before', 'after']
     };
-    var router = Router(options);
-    assert(typeof router === 'function');
-    assert(typeof router.all === 'function');
-    assert(typeof router.before === 'function');
-    assert(typeof router.after === 'function');
+    var router = new Router(options);
+    assert.equal(typeof router, 'function');
+    assert.equal(typeof router.all, 'function');
+    assert.equal(typeof router.before, 'function');
+    assert.equal(typeof router.after, 'function');
   });
 
   it('should return a Router with specific original methods then allow adding additional methods', function() {
     var options = {
       methods: ['before', 'after']
     };
-    var router = Router(options);
-    assert(typeof router === 'function');
-    assert(typeof router.all === 'function');
-    assert(typeof router.before === 'function');
-    assert(typeof router.after === 'function');
-    assert(typeof router.additional === 'undefined');
+
+    var router = new Router(options);
+    assert.equal(typeof router, 'function');
+    assert.equal(typeof router.all, 'function');
+    assert.equal(typeof router.before, 'function');
+    assert.equal(typeof router.after, 'function');
+    assert.equal(typeof router.additional, 'undefined');
 
     router.method('additional');
-    assert(typeof router.additional === 'function');
+    assert.equal(typeof router.additional, 'function');
   });
 
   it('should support dynamic routes on methods', function(cb) {
@@ -162,17 +163,15 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
-
       router.handle({
         path: '/foo',
         options: {
           method: 'before'
         }
-      }, cb);
+      }, function(err) {
+        assert.equal(err.message, 'foo');
+        cb();
+      });
     });
 
     it('should handle throwing inside routes with params on a method', function(cb) {
@@ -188,58 +187,54 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.use(function(err, file, next) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
-
       router.handle({
         path: '/foo/2',
         options: {
           method: 'before'
         }
-      }, function() {});
+      }, function(err) {
+        assert.equal(err.message, 'foo');
+        cb();
+      });
     });
   });
 
   describe('.param', function() {
     it('should call param function when routing on a method', function(cb) {
-      var router = new Router({
-        methods: ['before']
-      });
+      var called = [];
+      var file = {path: '/foo/123/bar', options: {method: 'before'}};
+      var router = new Router({methods: ['before']});
 
       router.param('id', function(file, next, id) {
         assert.equal(id, '123');
+        called.push('param');
         next();
       });
 
       router.before('/foo/:id/bar', function(file, next) {
         assert.equal(file.options.params.id, '123');
+        called.push('before');
         next();
       });
 
-      router.handle({
-        path: '/foo/123/bar',
-        options: {
-          method: 'before'
+      router.handle(file, function(err) {
+        if (err) {
+          cb(err);
+          return
         }
-      }, cb);
+
+        assert(called.indexOf('before') !== -1);
+        assert(called.indexOf('before') !== -1);
+        cb();
+      });
     });
 
     it('should only call once per request on a method', function(cb) {
       var count = 0;
-      var file = {
-        path: '/foo/bob/bar',
-        options: {
-          method: 'before'
-        }
-      };
-      var router = new Router({
-        methods: ['before']
-      });
-      var sub = new Router({
-        methods: ['before']
-      });
+
+      var file = {path: '/foo/bob/bar', options: {method: 'before'}};
+      var router = new Router({methods: ['before']});
+      var sub = new Router({methods: ['before']});
 
       sub.before('/bar', function(file, next) {
         next();

@@ -20,7 +20,41 @@ Copyright (c) 2009-2014 TJ Holowaychuk [tj@vision-media.ca](mailto:tj@vision-med
 
 ## API
 
-### [.dispatch](lib/route.js#L49)
+### [Layer](lib/layer.js#L23)
+
+Create a new `Layer` with the given `path`, `options` and handler function.
+
+**Params**
+
+* `path` **{String}**
+* `options` **{Object}**
+* `handler` **{Function}**
+* `returns` **{undefined}**
+
+**Example**
+
+```js
+var layer = new Layer('/', function(file, next) {
+  // do stuff to file
+  next(null, file);
+});
+```
+
+### [Route](lib/route.js#L19)
+
+Initialize `Route` with the given `path`,
+
+**Params**
+
+* `path` **{String}**
+
+**Example**
+
+```js
+var route = new Route('/', ['preRender', 'postRender']);
+```
+
+### [.dispatch](lib/route.js#L54)
 
 Dispatch a middleware stack over the given `file`.
 
@@ -37,7 +71,7 @@ route.dispatch(file, function(err, res) {
 });
 ```
 
-### [.all](lib/route.js#L89)
+### [.all](lib/route.js#L94)
 
 Handler for all methods on the route.
 
@@ -55,7 +89,7 @@ route.all(function(file, next) {
 });
 ```
 
-### [.handler](lib/route.js#L113)
+### [.handler](lib/route.js#L118)
 
 Add a middleware handler method for the given `name` to the route instance.
 
@@ -70,7 +104,7 @@ route.handler('before');
 route.handler('after');
 ```
 
-### [.handlers](lib/route.js#L130)
+### [.handlers](lib/route.js#L135)
 
 Add methods to the `route` instance for an array of middleware handlers.
 
@@ -84,7 +118,7 @@ Add methods to the `route` instance for an array of middleware handlers.
 route.handlers(['before', 'after']);
 ```
 
-### [.match](lib/route.js#L147)
+### [.match](lib/route.js#L152)
 
 Returns true if any layers in `route.stack` match
 the given `path`.
@@ -94,7 +128,7 @@ the given `path`.
 * `path` **{String}**
 * `returns` **{Boolean}**
 
-### [.layer](lib/route.js#L168)
+### [.layer](lib/route.js#L173)
 
 Push a layer onto the stack for the given handler `method` and middleware `fn`.
 
@@ -111,16 +145,22 @@ route.layer('after', {}, [function(){}, function(){}]);
 route.layer('other', [function(){}, function(){}]);
 ```
 
-### [Router](lib/router.js#L22)
+### [Router](lib/router.js#L25)
 
 Initialize a new `Router` with the given `methods`.
 
 **Params**
 
-* **{Array}**: methods
-* `returns` **{Function}**: Callable router function
+* `options` **{Object}**
+* `returns` **{Function}**: Returns a callable router function
 
-### [.route](lib/router.js#L56)
+**Example**
+
+```js
+var router = new Router({methods: ['preRender', 'postRender']});
+```
+
+### [.route](lib/router.js#L59)
 
 Create a new Route for the given path. Each route contains a separate middleware stack.
 
@@ -140,7 +180,7 @@ router.route('/foo')
   });
 ```
 
-### [.method](lib/router.js#L79)
+### [.method](lib/router.js#L82)
 
 Add additional methods to the current router instance.
 
@@ -159,7 +199,7 @@ router.post('.hbs', function(file, next) {
 });
 ```
 
-### [.handler](lib/router.js#L97)
+### [.handler](lib/router.js#L100)
 
 Add a middleware handler `method` to the instance.
 
@@ -175,7 +215,7 @@ router.handler('before');
 router.handler('after');
 ```
 
-### [.handlers](lib/router.js#L120)
+### [.handlers](lib/router.js#L123)
 
 Add an array of middleware handler `methods` to the instance.
 
@@ -190,7 +230,7 @@ Add an array of middleware handler `methods` to the instance.
 router.handlers(['before', 'after']);
 ```
 
-### [.handle](lib/router.js#L145)
+### [.handle](lib/router.js#L148)
 
 Dispatch a file into the router.
 
@@ -208,7 +248,7 @@ router.dispatch(file, function(err) {
 });
 ```
 
-### [.use](lib/router.js#L253)
+### [.use](lib/router.js#L256)
 
 Use the given middleware function, with optional path, defaulting to `/`. The other difference is that `route` path is stripped and not visible to the handler function. The main effect of this feature is that mounted handlers can operate without any code changes regardless of the `prefix` pathname.
 
@@ -227,7 +267,7 @@ router.use(function(file, next) {
 });
 ```
 
-### [.param](lib/router.js#L316)
+### [.param](lib/router.js#L319)
 
 Map the given param placeholder `name`(s) to the given callback.
 

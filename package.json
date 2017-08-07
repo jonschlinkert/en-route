@@ -1,16 +1,12 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "authors": [
     "Brian Woodward (https://twitter.com/doowb)",
     "Jon Schlinkert (http://twitter.com/jonschlinkert)"
-  ],
-  "maintainers": [
-    "Brian Woodward",
-    "Jon Schlinkert"
   ],
   "contributors": [
     "Brian Woodward (https://twitter.com/doowb)",
@@ -79,9 +75,9 @@
     "related": {
       "list": [
         "assemble",
-        "gulp-routes",
-        "template",
-        "verb"
+        "base",
+        "base-routes",
+        "gulp-routes"
       ]
     },
     "lint": {

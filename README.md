@@ -67,11 +67,11 @@ Dispatch a middleware stack over the given `file`.
 
 ```js
 route.dispatch(file, function(err, res) {
-  if (err) return console.log(err);
+  console.log(err, res);
 });
 ```
 
-### [.all](lib/route.js#L94)
+### [.all](lib/route.js#L88)
 
 Handler for all methods on the route.
 
@@ -85,11 +85,11 @@ Handler for all methods on the route.
 ```js
 route.all(function(file, next) {
   file.data.title = 'Home';
-  next();
+  next(null, file);
 });
 ```
 
-### [.handler](lib/route.js#L118)
+### [.handler](lib/route.js#L112)
 
 Add a middleware handler method for the given `name` to the route instance.
 
@@ -104,7 +104,7 @@ route.handler('before');
 route.handler('after');
 ```
 
-### [.handlers](lib/route.js#L135)
+### [.handlers](lib/route.js#L129)
 
 Add methods to the `route` instance for an array of middleware handlers.
 
@@ -118,17 +118,23 @@ Add methods to the `route` instance for an array of middleware handlers.
 route.handlers(['before', 'after']);
 ```
 
-### [.match](lib/route.js#L152)
+### [.match](lib/route.js#L150)
 
-Returns true if any layers in `route.stack` match
-the given `path`.
+Returns true if any layers in `route.stack` match the given `path`.
 
 **Params**
 
 * `path` **{String}**
 * `returns` **{Boolean}**
 
-### [.layer](lib/route.js#L173)
+**Example**
+
+```js
+console.log(route.match('foo/bar.js'));
+//=> true or false
+```
+
+### [.layer](lib/route.js#L171)
 
 Push a layer onto the stack for the given handler `method` and middleware `fn`.
 
@@ -248,7 +254,7 @@ router.dispatch(file, function(err) {
 });
 ```
 
-### [.use](lib/router.js#L256)
+### [.use](lib/router.js#L257)
 
 Use the given middleware function, with optional path, defaulting to `/`. The other difference is that `route` path is stripped and not visible to the handler function. The main effect of this feature is that mounted handlers can operate without any code changes regardless of the `prefix` pathname.
 
@@ -267,7 +273,7 @@ router.use(function(file, next) {
 });
 ```
 
-### [.param](lib/router.js#L319)
+### [.param](lib/router.js#L320)
 
 Map the given param placeholder `name`(s) to the given callback.
 
@@ -315,10 +321,12 @@ app.param('user_id', function(file, next, id) {
 
 ### Related projects
 
+You might also be interested in these projects:
+
 * [assemble](https://www.npmjs.com/package/assemble): Get the rocks out of your socks! Assemble makes you fast at creating web projects… [more](https://github.com/assemble/assemble) | [homepage](https://github.com/assemble/assemble "Get the rocks out of your socks! Assemble makes you fast at creating web projects. Assemble is used by thousands of projects for rapid prototyping, creating themes, scaffolds, boilerplates, e-books, UI components, API documentation, blogs, building websit")
+* [base-routes](https://www.npmjs.com/package/base-routes): Plugin for adding routes support to your `base` application. Requires templates support to work. | [homepage](https://github.com/node-base/base-routes "Plugin for adding routes support to your `base` application. Requires templates support to work.")
+* [base](https://www.npmjs.com/package/base): Framework for rapidly creating high quality node.js applications, using plugins like building blocks | [homepage](https://github.com/node-base/base "Framework for rapidly creating high quality node.js applications, using plugins like building blocks")
 * [gulp-routes](https://www.npmjs.com/package/gulp-routes): Add middleware to run for specified routes in your gulp pipeline. | [homepage](https://github.com/assemble/gulp-routes "Add middleware to run for specified routes in your gulp pipeline.")
-* [template](https://www.npmjs.com/package/template): Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template… [more](https://github.com/jonschlinkert/template) | [homepage](https://github.com/jonschlinkert/template "Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template helpers, middleware, routes, loaders, and lots more. Powers assemble, verb and other node.js apps.")
-* [verb](https://www.npmjs.com/package/verb): Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used… [more](https://github.com/verbose/verb) | [homepage](https://github.com/verbose/verb "Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used on hundreds of projects of all sizes to generate everything from API docs to readmes.")
 
 ### Contributing
 
@@ -328,7 +336,7 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 | **Commits** | **Contributor** | 
 | --- | --- |
-| 49 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 68 | [jonschlinkert](https://github.com/jonschlinkert) |
 | 35 | [doowb](https://github.com/doowb) |
 
 ### Building docs
@@ -368,4 +376,4 @@ Released under the [MIT License](LICENSE).
 
 ***
 
-_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on July 08, 2017._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on August 07, 2017._

@@ -1,16 +1,17 @@
 'use strict';
 
-var assert = require('assert');
-var after = require('after');
-var enRoute = require('..');
-var Router = enRoute.Router;
+const assert = require('assert');
+const after = require('after');
+const enRoute = require('..');
+const Router = enRoute.Router;
 
 describe('methods', function() {
   it('should return a Router with specific methods', function() {
-    var options = {
+    const options = {
       methods: ['before', 'after']
     };
-    var router = new Router(options);
+
+    const router = new Router(options);
     assert.equal(typeof router, 'function');
     assert.equal(typeof router.all, 'function');
     assert.equal(typeof router.before, 'function');
@@ -18,11 +19,11 @@ describe('methods', function() {
   });
 
   it('should return a Router with specific original methods then allow adding additional methods', function() {
-    var options = {
+    const options = {
       methods: ['before', 'after']
     };
 
-    var router = new Router(options);
+    const router = new Router(options);
     assert.equal(typeof router, 'function');
     assert.equal(typeof router.all, 'function');
     assert.equal(typeof router.before, 'function');
@@ -34,22 +35,18 @@ describe('methods', function() {
   });
 
   it('should support dynamic routes on methods', function(cb) {
-    var router = new Router({
-      methods: ['before']
-    });
-    var another = new Router({
-      methods: ['before']
-    });
+    const router = new Router({ methods: ['before'] });
+    const another = new Router({ methods: ['before'] });
 
     another.before('/:bar', function(file, next) {
-      assert(file.options.params.bar, 'route');
+      assert(file.routes.params.bar, 'route');
       next();
     });
-    router.use('/:foo', another);
 
+    router.use('/:foo', another);
     router.handle({
       path: '/test/route',
-      options: {
+      routes: {
         method: 'before'
       }
     }, cb);
@@ -57,12 +54,11 @@ describe('methods', function() {
 
   describe('.handle', function() {
     it('should dispatch to methods', function(cb) {
-      var router = new Router({
-        methods: ['before']
-      });
-      var file = {
+      const router = new Router({ methods: ['before'] });
+
+      const file = {
         path: '/foo',
-        options: {
+        routes: {
           method: 'before'
         }
       };
@@ -74,20 +70,21 @@ describe('methods', function() {
 
       router.handle(file, function(err) {
         if (err) return cb(err);
-
-        assert(file.content, 'foo');
+        ;
         cb();
       });
     });
 
     it('should dispatch to dynamic methods', function(cb) {
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
+
       router.method('additional');
-      var file = {
+
+      const file = {
         path: '/foo',
-        options: {
+        routes: {
           method: 'additional'
         }
       };
@@ -108,7 +105,7 @@ describe('methods', function() {
   describe('.multiple callbacks', function() {
     it('should throw if a callback is null on a method', function() {
       assert.throws(function() {
-        var router = new Router({
+        const router = new Router({
           methods: ['before']
         });
         router.route('/foo').before(null);
@@ -117,7 +114,7 @@ describe('methods', function() {
 
     it('should throw if a callback is undefined on a method', function() {
       assert.throws(function() {
-        var router = new Router({
+        const router = new Router({
           methods: ['before']
         });
         router.route('/foo').before(undefined);
@@ -126,7 +123,7 @@ describe('methods', function() {
 
     it('should throw if a callback is not a function on a method', function() {
       assert.throws(function() {
-        var router = new Router({
+        const router = new Router({
           methods: ['before']
         });
         router.route('/foo').before('not a function');
@@ -134,20 +131,23 @@ describe('methods', function() {
     });
 
     it('should not throw if all callbacks are functions on a method', function() {
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
-      router.route('/foo').before(function(file, next) {
-        next();
-      }).all(function(file, next) {
-        next();
-      });
+      router
+        .route('/foo')
+        .before(function(file, next) {
+          next();
+        })
+        .all(function(file, next) {
+          next();
+        });
     });
   });
 
   describe('error', function() {
     it('should skip non error middleware on a method', function(cb) {
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
 
@@ -163,19 +163,22 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.handle({
-        path: '/foo',
-        options: {
-          method: 'before'
+      router.handle(
+        {
+          path: '/foo',
+          routes: {
+            method: 'before'
+          }
+        },
+        function(err) {
+          assert.equal(err.message, 'foo');
+          cb();
         }
-      }, function(err) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
+      );
     });
 
     it('should handle throwing inside routes with params on a method', function(cb) {
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
 
@@ -187,23 +190,26 @@ describe('methods', function() {
         assert(false);
       });
 
-      router.handle({
-        path: '/foo/2',
-        options: {
-          method: 'before'
+      router.handle(
+        {
+          path: '/foo/2',
+          routes: {
+            method: 'before'
+          }
+        },
+        function(err) {
+          assert.equal(err.message, 'foo');
+          cb();
         }
-      }, function(err) {
-        assert.equal(err.message, 'foo');
-        cb();
-      });
+      );
     });
   });
 
   describe('.param', function() {
     it('should call param function when routing on a method', function(cb) {
-      var called = [];
-      var file = {path: '/foo/123/bar', options: {method: 'before'}};
-      var router = new Router({methods: ['before']});
+      const called = [];
+      const file = { path: '/foo/123/bar', routes: { method: 'before' } };
+      const router = new Router({ methods: ['before'] });
 
       router.param('id', function(file, next, id) {
         assert.equal(id, '123');
@@ -212,7 +218,7 @@ describe('methods', function() {
       });
 
       router.before('/foo/:id/bar', function(file, next) {
-        assert.equal(file.options.params.id, '123');
+        assert.equal(file.routes.params.id, '123');
         called.push('before');
         next();
       });
@@ -220,7 +226,7 @@ describe('methods', function() {
       router.handle(file, function(err) {
         if (err) {
           cb(err);
-          return
+          return;
         }
 
         assert(called.indexOf('before') !== -1);
@@ -230,11 +236,11 @@ describe('methods', function() {
     });
 
     it('should only call once per request on a method', function(cb) {
-      var count = 0;
+      let count = 0;
 
-      var file = {path: '/foo/bob/bar', options: {method: 'before'}};
-      var router = new Router({methods: ['before']});
-      var sub = new Router({methods: ['before']});
+      const file = { path: '/foo/bob/bar', routes: { method: 'before' } };
+      const router = new Router({ methods: ['before'] });
+      const sub = new Router({ methods: ['before'] });
 
       sub.before('/bar', function(file, next) {
         next();
@@ -258,17 +264,17 @@ describe('methods', function() {
     });
 
     it('should call when values differ on a method', function(cb) {
-      var count = 0;
-      var file = {
+      let count = 0;
+      const file = {
         path: '/foo/bob/bar',
-        options: {
+        routes: {
           method: 'before'
         }
       };
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
-      var sub = new Router({
+      const sub = new Router({
         methods: ['before']
       });
 
@@ -296,22 +302,22 @@ describe('methods', function() {
 
   describe('parallel calls', function() {
     it('should not mix calls on a method', function(cb) {
-      var file1 = {
+      const file1 = {
         path: '/foo/50/bar',
-        options: {
+        routes: {
           method: 'before'
         }
       };
-      var file2 = {
+      const file2 = {
         path: '/foo/10/bar',
-        options: {
+        routes: {
           method: 'before'
         }
       };
-      var router = new Router({
+      const router = new Router({
         methods: ['before']
       });
-      var sub = new Router({
+      const sub = new Router({
         methods: ['before']
       });
 
@@ -333,14 +339,14 @@ describe('methods', function() {
       router.handle(file1, function(err) {
         assert.ifError(err);
         assert.equal(file1.ms, 50);
-        assert.equal(file1.options.originalPath, '/foo/50/bar');
+        assert.equal(file1.routes.originalPath, '/foo/50/bar');
         cb();
       });
 
       router.handle(file2, function(err) {
         assert.ifError(err);
         assert.equal(file2.ms, 10);
-        assert.equal(file2.options.originalPath, '/foo/10/bar');
+        assert.equal(file2.routes.originalPath, '/foo/10/bar');
         cb();
       });
     });

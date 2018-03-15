@@ -26,25 +26,20 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "nyc --reporter=text --reporter=html mocha"
   },
   "dependencies": {
-    "arr-flatten": "^1.0.3",
-    "arr-union": "^3.1.0",
-    "async-array-reduce": "^0.2.1",
-    "debug": "^2.6.8",
-    "define-property": "^1.0.0",
-    "path-to-regexp": "^1.7.0",
+    "arr-flatten": "^1.1.0",
+    "async-array-reduce": "^1.0.0",
+    "debug": "^3.1.0",
+    "path-to-regexp": "^2.2.0",
     "typeof-article": "^0.1.1"
   },
   "devDependencies": {
     "after": "^0.8.2",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^4.0.0",
-    "gulp-format-md": "^0.1.12",
-    "gulp-istanbul": "^1.1.2",
-    "gulp-mocha": "^3.0.1",
-    "mocha": "^3.4.2"
+    "gulp-format-md": "^1.0.0",
+    "mocha": "^3.5.3",
+    "nyc": "^11.6.0"
   },
   "keywords": [
     "assemble",

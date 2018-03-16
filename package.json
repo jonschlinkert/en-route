@@ -29,8 +29,6 @@
     "test": "nyc --reporter=text --reporter=html mocha"
   },
   "dependencies": {
-    "arr-flatten": "^1.1.0",
-    "async-array-reduce": "^1.0.0",
     "debug": "^3.1.0",
     "kind-of": "^6.0.2",
     "path-to-regexp": "^2.2.0",
@@ -39,6 +37,7 @@
   "devDependencies": {
     "after": "^0.8.2",
     "gulp-format-md": "^1.0.0",
+    "micromatch": "^3.1.9",
     "mocha": "^3.5.3",
     "nyc": "^11.6.0",
     "vinyl": "^2.1.0"

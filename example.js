@@ -1,14 +1,18 @@
 const path = require('path');
 const Router = require('.');
 const File = require('vinyl');
-const router = new Router();
+const mm = require('micromatch');
+const router = new Router({
+  toRegex: str => mm.makeRe(str, { end: true, capture: true })
+});
+
 router.handler(['onLoad', 'onRender']);
 
 const file = new File({ path: path.resolve(process.cwd(), 'index.js') });
 
-router.onLoad('index.*', file => {
+router.onLoad('**/index.*', file => {
   console.log('File 1:', file);
-  throw new Error('should be caught');
+  // throw new Error('should be caught');
   file.extname = '.md';
 });
 
@@ -16,7 +20,7 @@ router.onLoad(/not-a-match/, file => {
   new Error('should not match');
 });
 
-router.onLoad(/\.js$/, file => {
+router.onLoad(/\.md$/, file => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       console.log('File 2:', file);
@@ -53,23 +57,6 @@ router.onLoad(/.*\.html$/, async file => {
     }, 500);
   });
 });
-// console.log(router)
-
-// router.handle('onLoad', file, (err, res) => {
-//   if (err) {
-//     console.log('onLoad Error:', err);
-//     process.exit();
-//   }
-
-//   router.handle('onRender', file, (err, res) => {
-//     if (err) {
-//       console.log('onRender Error:', err);
-//       process.exit();
-//     }
-
-//     console.log('Done:', res);
-//   });
-// });
 
 router.handle('onLoad', file)
   .then(file => router.handle('onRender', file))

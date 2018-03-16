@@ -15,7 +15,7 @@ describe('Route', function() {
         next();
       });
 
-      route.dispatch(file, function(err) {
+      route.handle(file, function(err) {
         if (err) return cb(err);
         assert(file.called);
         cb();
@@ -31,7 +31,7 @@ describe('Route', function() {
         next();
       });
 
-      route.dispatch(file).then(() => {
+      route.handle(file).then(() => {
         assert(file.called);
         cb();
       });
@@ -51,7 +51,7 @@ describe('Route', function() {
         next();
       });
 
-      route.dispatch(file, function(err) {
+      route.handle(file, function(err) {
         if (err) return cb(err);
         assert.equal(file.count, 2);
         cb();
@@ -72,7 +72,7 @@ describe('Route', function() {
         next();
       });
 
-      route.dispatch(file, function(err) {
+      route.handle(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
         cb();
@@ -91,7 +91,7 @@ describe('Route', function() {
         next();
       });
 
-      route.dispatch(file, function(err) {
+      route.handle(file, function(err) {
         assert(err);
         assert.equal(err.message, 'foobar');
         cb();
@@ -106,7 +106,7 @@ describe('Route', function() {
         throw new Error('boom!');
       });
 
-      route.dispatch(file, function(err) {
+      route.handle(file, function(err) {
         assert(err);
         assert.equal(err.message, 'boom!');
         cb();

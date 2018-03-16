@@ -70,7 +70,7 @@ describe('methods', function() {
 
       router.handle(file, function(err) {
         if (err) return cb(err);
-        ;
+        
         cb();
       });
     });

@@ -1,12 +1,13 @@
 'use strict';
 
-var assert = require('assert');
-var Router = require('..');
-var Layer = Router.Layer;
+require('mocha');
+const assert = require('assert');
+const Router = require('..');
+const Layer = Router.Layer;
 
 describe('Layer', function() {
   describe('with parameterized path', function() {
-    var layer = new Layer('/blog/:year/:month/:day/:slug');
+    const layer = new Layer('/blog/:year/:month/:day/:slug');
 
     it('should have path property', function() {
       assert.equal(layer.path, '/blog/:year/:month/:day/:slug');

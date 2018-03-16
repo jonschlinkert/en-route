@@ -1,23 +1,23 @@
 'use strict';
 
-var Router = require('../');
-var after = require('after');
-var assert = require('assert');
+const Router = require('../');
+const after = require('after');
+const assert = require('assert');
 
 describe('Router', function() {
   it('should return a function with router methods', function() {
-    var router = Router();
+    let router = Router();
     assert.equal(typeof router, 'function');
 
-    var router = new Router();
+    router = new Router();
     assert.equal(typeof router, 'function');
     assert.equal(typeof router.handle, 'function');
     assert.equal(typeof router.use, 'function');
   });
 
   it('should support .use of other routers', function(cb) {
-    var router = new Router();
-    var another = new Router();
+    const router = new Router();
+    const another = new Router();
 
     another.all('/bar', function(file, next) {
       next();
@@ -30,8 +30,8 @@ describe('Router', function() {
   });
 
   it('should support dynamic routes', function(cb) {
-    var router = new Router();
-    var another = new Router();
+    const router = new Router();
+    const another = new Router();
 
     another.all('/:bar', function(file, next) {
       assert.equal(file.routes.params.bar, 'route');
@@ -39,12 +39,12 @@ describe('Router', function() {
     });
 
     router.use('/:foo', another);
-    var file = {path: '/test/route'};
+    const file = {path: '/test/route'};
     router.handle(file, cb);
   });
 
   it('should handle blank path', function(cb) {
-    var router = new Router();
+    const router = new Router();
 
     router.use(function(file, next) {
       false.should.be.true;
@@ -56,8 +56,8 @@ describe('Router', function() {
 
   describe('.handle', function() {
     it('should dispatch', function(cb) {
-      var router = new Router();
-      var file = {path: '/foo'};
+      const router = new Router();
+      const file = {path: '/foo'};
 
       router.route('/foo')
         .all(function(file, next) {
@@ -66,6 +66,7 @@ describe('Router', function() {
         });
 
       router.handle(file, function(err) {
+        assert(!err);
         assert.equal(file.content, 'foo');
         cb();
       });
@@ -75,21 +76,21 @@ describe('Router', function() {
   describe('.multiple callbacks', function() {
     it('should throw if a callback is not a function', function() {
       assert.throws(function() {
-        var router = new Router();
+        const router = new Router();
         router.route('/foo').all(null);
       });
       assert.throws(function() {
-        var router = new Router();
+        const router = new Router();
         router.route('/foo').all(undefined);
       });
       assert.throws(function() {
-        var router = new Router();
+        const router = new Router();
         router.route('/foo').all('not a function');
       });
     });
 
     it('should support chained calls', function() {
-      var router = new Router();
+      const router = new Router();
       router.route('/foo')
         .all(function(file, next) {
           next();
@@ -102,7 +103,7 @@ describe('Router', function() {
 
   describe('error', function() {
     it('should skip non error middleware', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.all('/foo', function(file, next) {
         next(new Error('foo'));
@@ -124,7 +125,7 @@ describe('Router', function() {
     });
 
     it('should handle throwing inside routes with params', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.all('/foo/:id', function(file, next) {
         throw new Error('arbitrary');
@@ -141,7 +142,7 @@ describe('Router', function() {
     });
 
     it('should handle throwing in handler after async param', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.param('user', function(file, next, val) {
         process.nextTick(function() {
@@ -163,7 +164,7 @@ describe('Router', function() {
     });
 
     it('should handle throwing inside error handlers', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.use(function(file, next) {
         throw new Error('boom!');
@@ -178,14 +179,14 @@ describe('Router', function() {
 
   describe('.use', function() {
     it('should require arguments', function() {
-      var router = new Router();
+      const router = new Router();
       assert.throws(function() {
         router.use.bind(router)();
       });
     });
 
     it('should not accept non-functions', function() {
-      var router = new Router();
+      const router = new Router();
       assert.throws(function() {
         router.use.bind(router, '/', 'hello')();
       });
@@ -201,8 +202,8 @@ describe('Router', function() {
     });
 
     it('should accept array of middleware', function(cb) {
-      var count = 0;
-      var router = new Router();
+      let count = 0;
+      const router = new Router();
 
       function fn1(file, next) {
         assert.equal(++count, 1);
@@ -228,7 +229,7 @@ describe('Router', function() {
 
   describe('.param', function() {
     it('should call param function when routing', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.param('id', function(file, next, id) {
         assert.equal(id, '123');
@@ -246,7 +247,7 @@ describe('Router', function() {
     });
 
     it('should call param function when routing middleware', function(cb) {
-      var router = new Router();
+      const router = new Router();
 
       router.param('id', function(file, next, id) {
         assert.equal(id, '123');
@@ -263,10 +264,10 @@ describe('Router', function() {
     });
 
     it('should only call once per request', function(cb) {
-      var count = 0;
-      var file = {path: '/foo/bob/bar'};
-      var router = new Router();
-      var sub = new Router();
+      let count = 0;
+      const file = {path: '/foo/bob/bar'};
+      const router = new Router();
+      const sub = new Router();
 
       sub.all('/bar', function(file, next) {
         next();
@@ -290,10 +291,10 @@ describe('Router', function() {
     });
 
     it('should call when values differ', function(cb) {
-      var count = 0;
-      var file = {path: '/foo/bob/bar'};
-      var router = new Router();
-      var sub = new Router();
+      let count = 0;
+      const file = {path: '/foo/bob/bar'};
+      const router = new Router();
+      const sub = new Router();
 
       sub.all('/bar', function(file, next) {
         next();
@@ -319,14 +320,14 @@ describe('Router', function() {
 
   describe('parallel requests', function() {
     it('should not mix requests', function(cb) {
-      var file1 = {
+      const file1 = {
         path: '/foo/50/bar'
       };
-      var file2 = {
+      const file2 = {
         path: '/foo/10/bar'
       };
-      var router = new Router();
-      var sub = new Router();
+      const router = new Router();
+      const sub = new Router();
 
       cb = after(2, cb);
 

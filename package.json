@@ -57,6 +57,11 @@
     "routes",
     "routing"
   ],
+  "eslintConfig": {
+    "rules": {
+      "no-console": "off"
+    }
+  },
   "verb": {
     "toc": false,
     "layout": "default",

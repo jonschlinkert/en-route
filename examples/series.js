@@ -1,86 +1,48 @@
-const path = require('path');
 const Router = require('..');
 const File = require('vinyl');
+const file = new File({ path: 'foo/bar/index.js' });
 const router = new Router();
 
-router.handler(['onLoad', 'onRender']);
-const file = new File({ path: 'foo/bar/index.js' });
+router.handler(['onLoad', 'preRender', 'postRender']);
+router.on('preHandle', (method, file) => console.log(`Before ${method}:`, file));
+router.on('postHandle', (method, file) => console.log(`After ${method}:`, file));
 
-router.on('preHandle', (method, file) => {
-  console.log(`Before ${method}:`, file);
-});
-router.on('postHandle', (method, file) => {
-  console.log(`After ${method}:`, file);
-});
+let n = 0;
+const wait = (fn, timeout = 500) => {
+  return file => {
+    console.log();
+    console.log('before', ++n);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        console.log(`after ${n}:`, file);
+        console.log();
+        fn(file);
+        resolve(file);
+      }, timeout);
+    });
+  };
+};
 
-router.onLoad('(.*)/:name.js', (file, params) => {
-  console.log('Params:', params);
-  file.extname = '.md';
-});
-
-router.onRender(/./, (file, params) => {
-  console.log('onRender:', file);
-});
-
-router.onLoad(/not-a-match/, file => {
-  new Error('should not match');
-});
-
-router.onLoad(/\.md$/, file => {
-  console.log();
-  console.log('before 2');
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log('after 2:', file);
-      console.log()
-      file.extname = '.html';
-      resolve(file);
-    }, 1000);
+router
+  .onLoad('(.*)/:name.js', (file, params) => {
+    console.log('Params:', params);
+    file.extname = '.md';
+  })
+  .preRender(/./, console.log.bind(console, 'preRender:'))
+  .onLoad(/not-a-match/, file => {
+    throw new Error('should not match');
   });
-});
 
-router.onLoad(/.*\.html$/, file => {
-  console.log();
-  console.log('before 3');
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log('after 3:', file);
-      console.log()
-      file.stem = 'foo';
-      resolve(file);
-    }, 1000);
-  });
-}, file => {
-  console.log();
-  console.log('before 4');
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log('after 4:', file);
-      console.log()
-      file.stem = 'bar';
-      resolve(file);
-    }, 1000);
-  });
-}, file => {
-  console.log();
-  console.log('before 5');
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log('after 5:', file);
-      console.log()
-      file.stem = 'baz';
-      resolve(file);
-    }, 1000);
-  });
-});
+router
+  .onLoad(/\.md$/, wait(file => (file.extname = '.html')))
+  .onLoad(/\.html$/, wait(file => (file.stem = 'foo')))
+  .onLoad(/\.html$/, wait(file => (file.stem = 'bar')))
+  .onLoad(/\.html$/, wait(file => (file.stem = 'baz')))
 
-router.handle('onLoad', file)
-  .then(file => router.handle('onRender', file))
+router.handle(file)
+  .then(file => router.handle('preRender', file))
   .then(file => console.log('Done:', file))
   .catch(err => {
     console.error(err);
     process.exit();
   });
-
-
-// setTimeout(spinner(), 5000);

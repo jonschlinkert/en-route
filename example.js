@@ -1,20 +1,24 @@
 const path = require('path');
 const Router = require('.');
 const File = require('vinyl');
-const mm = require('micromatch');
 const router = new Router();
 
 router.handler(['onLoad', 'onRender']);
+const file = new File({ path: 'foo/bar/index.js' });
 
-const file = new File({ path: path.resolve(process.cwd(), 'index.js') });
+router.on('handle', (method, file) => {
+  console.log(`Before ${method}:`, file);
+});
+router.on('after', (method, file) => {
+  console.log(`After ${method}:`, file);
+});
 
-router.onLoad(mm.makeRe('**/index.*'), file => {
-  console.log('File 1:', file);
-  // throw new Error('should be caught');
+router.onLoad('(.*)/:name.js', (file, params) => {
+  console.log('Params:', params);
   file.extname = '.md';
 });
 
-router.onRender(/./, file => {
+router.onRender(/./, (file, params) => {
   console.log('onRender:', file);
 });
 
@@ -23,9 +27,12 @@ router.onLoad(/not-a-match/, file => {
 });
 
 router.onLoad(/\.md$/, file => {
+  console.log();
+  console.log('before 2');
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      console.log('File 2:', file);
+      console.log('after 2:', file);
+      console.log()
       file.extname = '.html';
       resolve(file);
     }, 2000);
@@ -33,30 +40,37 @@ router.onLoad(/\.md$/, file => {
 });
 
 router.onLoad(/.*\.html$/, file => {
+  console.log();
+  console.log('before 3');
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      console.log('File 3:', file);
+      console.log('after 3:', file);
+      console.log()
       file.stem = 'foo';
       resolve(file);
-    }, 500);
+    }, 2000);
   });
 }, file => {
+  console.log();
+  console.log('before 4');
   return new Promise((resolve, reject) => {
-    console.log('before 4')
     setTimeout(() => {
-      console.log('File 4:', file);
+      console.log('after 4:', file);
+      console.log()
       file.stem = 'bar';
       resolve(file);
-    }, 500);
+    }, 2000);
   });
 }, file => {
+  console.log();
+  console.log('before 5');
   return new Promise((resolve, reject) => {
-    console.log('before 5')
     setTimeout(() => {
-      console.log('File 5:', file);
+      console.log('after 5:', file);
+      console.log()
       file.stem = 'baz';
       resolve(file);
-    }, 500);
+    }, 2000);
   });
 });
 
@@ -67,3 +81,6 @@ router.handle('onLoad', file)
     console.error(err);
     process.exit();
   });
+
+
+// setTimeout(spinner(), 5000);

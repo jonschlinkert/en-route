@@ -1,15 +1,15 @@
 const path = require('path');
-const Router = require('.');
+const Router = require('..');
 const File = require('vinyl');
 const router = new Router();
 
 router.handler(['onLoad', 'onRender']);
 const file = new File({ path: 'foo/bar/index.js' });
 
-router.on('handle', (method, file) => {
+router.on('preHandle', (method, file) => {
   console.log(`Before ${method}:`, file);
 });
-router.on('after', (method, file) => {
+router.on('postHandle', (method, file) => {
   console.log(`After ${method}:`, file);
 });
 
@@ -35,7 +35,7 @@ router.onLoad(/\.md$/, file => {
       console.log()
       file.extname = '.html';
       resolve(file);
-    }, 2000);
+    }, 1000);
   });
 });
 
@@ -48,7 +48,7 @@ router.onLoad(/.*\.html$/, file => {
       console.log()
       file.stem = 'foo';
       resolve(file);
-    }, 2000);
+    }, 1000);
   });
 }, file => {
   console.log();
@@ -59,7 +59,7 @@ router.onLoad(/.*\.html$/, file => {
       console.log()
       file.stem = 'bar';
       resolve(file);
-    }, 2000);
+    }, 1000);
   });
 }, file => {
   console.log();
@@ -70,7 +70,7 @@ router.onLoad(/.*\.html$/, file => {
       console.log()
       file.stem = 'baz';
       resolve(file);
-    }, 2000);
+    }, 1000);
   });
 });
 

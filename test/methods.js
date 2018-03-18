@@ -2,35 +2,24 @@
 
 const assert = require('assert');
 const after = require('after');
-const enRoute = require('..');
-const Router = enRoute.Router;
+const Router = require('..');
 
 describe('methods', function() {
-  it('should return a Router with specific methods', function() {
-    const options = {
-      methods: ['before', 'after']
-    };
-
-    const router = new Router(options);
-    assert.equal(typeof router, 'function');
+  it('should return a Router with the methods defined on the options', function() {
+    const router = new Router({ methods: ['before', 'after'] });
     assert.equal(typeof router.all, 'function');
     assert.equal(typeof router.before, 'function');
     assert.equal(typeof router.after, 'function');
   });
 
   it('should return a Router with specific original methods then allow adding additional methods', function() {
-    const options = {
-      methods: ['before', 'after']
-    };
-
-    const router = new Router(options);
-    assert.equal(typeof router, 'function');
+    const router = new Router({ methods: ['before', 'after'] });
     assert.equal(typeof router.all, 'function');
     assert.equal(typeof router.before, 'function');
     assert.equal(typeof router.after, 'function');
     assert.equal(typeof router.additional, 'undefined');
 
-    router.method('additional');
+    router.handler('additional');
     assert.equal(typeof router.additional, 'function');
   });
 
@@ -38,18 +27,14 @@ describe('methods', function() {
     const router = new Router({ methods: ['before'] });
     const another = new Router({ methods: ['before'] });
 
-    another.before('/:bar', function(file, next) {
+    another.before('/:bar', function(file) {
       assert(file.routes.params.bar, 'route');
-      next();
     });
 
-    router.use('/:foo', another);
-    router.handle({
-      path: '/test/route',
-      routes: {
-        method: 'before'
-      }
-    }, cb);
+    // router.use('/:foo', another);
+    router.handle({path: '/test/route', routes: { method: 'before' }})
+      .then(() => cb())
+      .catch(cb)
   });
 
   describe('.handle', function() {
@@ -70,7 +55,7 @@ describe('methods', function() {
 
       router.handle(file, function(err) {
         if (err) return cb(err);
-        
+
         cb();
       });
     });
@@ -80,7 +65,7 @@ describe('methods', function() {
         methods: ['before']
       });
 
-      router.method('additional');
+      router.handler('additional');
 
       const file = {
         path: '/foo',

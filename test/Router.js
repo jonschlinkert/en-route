@@ -320,12 +320,8 @@ describe('Router', function() {
 
   describe('parallel requests', function() {
     it('should not mix requests', function(cb) {
-      const file1 = {
-        path: '/foo/50/bar'
-      };
-      const file2 = {
-        path: '/foo/10/bar'
-      };
+      const file1 = {path: '/foo/50/bar'};
+      const file2 = {path: '/foo/10/bar'};
       const router = new Router();
       const sub = new Router();
 

@@ -19,7 +19,4 @@ router.handle('onLoad', file)
   .then(file => router.handle('preRender', file))
   .then(file => router.handle('postRender', file))
   .then(file => console.log('Done:', file))
-  .catch(err => {
-    console.error(err);
-    process.exit();
-  });
+  .catch(console.error);

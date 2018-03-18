@@ -16,7 +16,4 @@ router
 router.handle(file)
   .then(file => router.handle('preRender', file))
   .then(file => console.log('Done:', file))
-  .catch(err => {
-    console.error(err);
-    process.exit();
-  });
+  .catch(console.error);

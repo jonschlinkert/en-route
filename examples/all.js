@@ -4,8 +4,9 @@ const file = new File({ path: 'templates/pages/index.hbs' });
 const router = new Router();
 
 router.handler(['onLoad', 'preRender', 'postRender']);
-router.on('preHandle', (method, file) => console.log(`Before ${method}:`, file));
-router.on('postHandle', (method, file) => console.log(`After ${method}:`, file));
+pages.router.on('handle', (method, view, route) => {
+  console.log(`${route.status} ${method}:`, view);
+});
 
 router
   .onLoad(/\.hbs$/, file => (file.extname = '.html'))
@@ -15,7 +16,4 @@ router
 
 router.handle(file)
   .then(file => console.log('Done:', file))
-  .catch(err => {
-    console.error(err);
-    process.exit();
-  });
+  .catch(console.error);

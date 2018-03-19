@@ -1,7 +1,6 @@
 {
   "extends": [
-    "eslint:recommended",
-    "./package.json"
+    "eslint:recommended"
   ],
 
   "env": {

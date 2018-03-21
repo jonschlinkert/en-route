@@ -5,8 +5,22 @@ const Router = require('..');
 const Route = Router.Route;
 
 describe('Route', function() {
+  describe('handlers', function() {
+    it('should add handler', async function() {
+      const file = { path: '/', count: 0 };
+      const route = new Route('/', file => (file.count++));
+
+      return await route.handle(file)
+        .then(route.handle.bind(route))
+        .then(route.handle.bind(route))
+        .then(file => {
+          assert.equal(file.count, 3);
+        });
+    });
+  });
+
   describe('.all', function() {
-    it('should add handler', function(cb) {
+    it('should add handler', function() {
       const file = { path: '/' };
       const route = new Route('/foo');
 
@@ -14,15 +28,13 @@ describe('Route', function() {
         file.called = true;
       });
 
-      route.handle(file)
+      return route.handle(file)
         .then(file => {
           assert(file.called);
-          cb();
-        })
-        .catch(cb);
+        });
     });
 
-    it('should stack', function(cb) {
+    it('should stack', function() {
       const file = { count: 0, path: '/' };
       const route = new Route('/foo');
 
@@ -34,17 +46,15 @@ describe('Route', function() {
         file.count++;
       });
 
-      route.handle(file)
+      return route.handle(file)
         .then(file => {
           assert.equal(file.count, 2);
-          cb();
-        })
-        .catch(cb);
+        });
     });
   });
 
   describe('errors', function() {
-    it('should handle errors', function(cb) {
+    it('should handle errors', function() {
       const file = { path: '/' };
       const route = new Route();
       const msg = 'this is an error!';
@@ -53,17 +63,16 @@ describe('Route', function() {
         throw new Error(msg);
       });
 
-      route.handle(file)
+      return route.handle(file)
         .then(function() {
-          cb(new Error('expected an error'));
+          throw new Error('expected an error');
         })
         .catch(err => {
           assert.equal(err.message, msg);
-          cb();
         });
     });
 
-    it('should stop handling middleware wher an error is returned', function(cb) {
+    it('should stop handling middleware wher an error is returned', function() {
       const file = { path: '/' };
       const route = new Route();
       const msg = 'this is an error!';
@@ -76,18 +85,17 @@ describe('Route', function() {
         file.path = 'foo';
       });
 
-      route.handle(file)
+      return route.handle(file)
         .then(function() {
-          cb(new Error('expected an error'));
+          throw new Error('expected an error');
         })
         .catch(err => {
           assert.equal(file.path, '/');
           assert.equal(err.message, msg);
-          cb();
         });
     });
 
-    it('should handle throw', function(cb) {
+    it('should handle throw', function() {
       const file = { path: '/' };
       const route = new Route();
       const msg = 'this is an error!';
@@ -101,14 +109,13 @@ describe('Route', function() {
         file.path = 'foo';
       });
 
-      route.handle(file)
+      return route.handle(file)
         .then(function() {
-          cb(new Error('expected an error'));
+          throw new Error('expected an error');
         })
         .catch(err => {
           assert.equal(file.path, '/');
           assert.equal(err.message, msg);
-          cb();
         });
     });
   });

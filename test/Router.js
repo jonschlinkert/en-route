@@ -99,12 +99,12 @@ describe('handlers', function() {
       const router = new Router({ handlers: ['before'] });
       const file = { path: '/foo' };
 
-      router.route('/foo')
+      const foo = router.route('/foo')
         .before(function(file) {
           file.content = 'foo';
         });
 
-      return router.handle(file)
+      return foo.handle(file)
         .then(() => {
           assert.equal(file.content, 'foo');
         });
@@ -114,14 +114,29 @@ describe('handlers', function() {
       const router = new Router({ handlers: ['before'] });
       const file = { path: '/bar' };
 
-      router.route('/foo')
+      const route = router.route('/foo')
         .before(function(file) {
           file.content = 'foo';
         });
 
-      return router.handle(file)
+      return route.handle(file)
         .then(() => {
           assert.equal(file.content, undefined);
+        });
+    });
+
+    it('should register a layer for each pattern specified on the route', function() {
+      const router = new Router({ handlers: ['before'] });
+      const file = { path: '/bar' };
+
+      const route = router.route(['/foo', '/bar'])
+        .before(function(file) {
+          file.content = 'bar';
+        });
+
+      return route.handle(file)
+        .then(() => {
+          assert.equal(file.content, 'bar');
         });
     });
 
@@ -131,12 +146,12 @@ describe('handlers', function() {
 
       router.handler('additional');
 
-      router.route('/foo')
+      const foo = router.route('/foo')
         .additional(function(file) {
           file.content = 'foo';
         });
 
-      return router.handle(file)
+      return foo.handle(file)
         .then(() => {
           assert(file.content, 'foo');
         });

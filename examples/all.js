@@ -1,19 +1,11 @@
 const Router = require('..');
 const File = require('vinyl');
 const file = new File({ path: 'templates/pages/index.hbs' });
-const router = new Router();
+const router = new Router({ handlers: ['onLoad', 'preRender', 'postRender'] });
 
-router.handler(['onLoad', 'preRender', 'postRender']);
-pages.router.on('handle', (method, view, route) => {
-  console.log(`${route.status} ${method}:`, view);
-});
+router.onLoad(/./, file => console.log('onLoad:', file));
+router.preRender(/./, file => console.log('preRender:', file));
 
-router
-  .onLoad(/\.hbs$/, file => (file.extname = '.html'))
-  .onLoad(/\.html$/, file => (file.stem = 'foo'))
-  .preRender(/\.html$/, file => (file.stem = 'bar'))
-  .postRender(/\.html$/, file => (file.stem = 'baz'));
-
-router.handle(file)
+router.all(file)
   .then(file => console.log('Done:', file))
   .catch(console.error);

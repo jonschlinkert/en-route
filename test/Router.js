@@ -96,17 +96,20 @@ describe('handlers', function() {
     });
 
     it('should dispatch to handlers', function() {
-      const router = new Router({ handlers: ['before'] });
-      const file = { path: '/foo' };
+      const router = new Router({ handlers: ['before', 'after'] });
+      const file = { path: '/foo', content: '' };
 
       const foo = router.route('/foo')
         .before(function(file) {
-          file.content = 'foo';
+          file.content += 'foo';
+        })
+        .after(function(file) {
+          file.content += 'bar';
         });
 
       return foo.handle(file)
         .then(() => {
-          assert.equal(file.content, 'foo');
+          assert.equal(file.content, 'foobar');
         });
     });
 

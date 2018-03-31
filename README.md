@@ -2,6 +2,8 @@
 
 > Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.
 
+Please consider following this project's author, [Jon Schlinkert](https://github.com/jonschlinkert), and consider starring the project to show your :heart: and support.
+
 ## Install
 
 Install with [npm](https://www.npmjs.com/):
@@ -10,306 +12,295 @@ Install with [npm](https://www.npmjs.com/):
 $ npm install --save en-route
 ```
 
-## Thank you
-
-This was highly inspired by express routes. Thank you, [TJ](https://github.com/tj). Our lives are easier because of your hard work.
-
-Express is released under the MIT license.
-The code that inspired this library was
-Copyright (c) 2009-2014 TJ Holowaychuk [tj@vision-media.ca](mailto:tj@vision-media.ca).
-
 ## API
 
-### [Layer](lib/layer.js#L23)
+### [Layer](lib/layer.js#L22)
 
-Create a new `Layer` with the given `path`, `options` and handler function.
+Create a new `Layer` with the given `pattern`, handler function and options.
 
 **Params**
 
-* `path` **{String}**
-* `options` **{Object}**
-* `handler` **{Function}**
-* `returns` **{undefined}**
+* `pattern` **{string}**
+* `handler` **{function}**
+* `options` **{object}**
 
 **Example**
 
 ```js
-var layer = new Layer('/', function(file, next) {
+const layer = new Layer('/', file => {
   // do stuff to file
-  next(null, file);
+  file.extname = '.html';
 });
 ```
 
-### [Route](lib/route.js#L19)
+### [.handle](lib/layer.js#L50)
 
-Initialize `Route` with the given `path`,
+Calls the layer handler on the given file if the `file.path` matches the layer pattern.
 
 **Params**
 
-* `path` **{String}**
+* `file` **{object}**: File object
+* `returns` **{Promise}**
 
 **Example**
 
 ```js
-var route = new Route('/', ['preRender', 'postRender']);
+layer.handle(file)
+  .then(() => console.log('Done:', file))
+  .then(console.error)
 ```
 
-### [.dispatch](lib/route.js#L54)
+### [.match](lib/layer.js#L70)
 
-Dispatch a middleware stack over the given `file`.
+Attempts to match a file path with the layer pattern. If the path matches, an object of params is returned (see [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for details), otherwise `null` is returned.
 
 **Params**
 
-* `file` **{Object}**: File object
-* `returns` **{Function}**: Callback that exposes `err` and `file`
+* `filepath` **{string}**
+* `returns` **{object|null}**
 
 **Example**
 
 ```js
-route.dispatch(file, function(err, res) {
-  console.log(err, res);
-});
+const layer = new Layer('/:name');
+console.log(layer.match('/foo')) //=> { name: 'foo' }
 ```
 
-### [.all](lib/route.js#L88)
+### [Route](lib/route.js#L28)
 
-Handler for all methods on the route.
+Create a new `Route` with the given pattern, handler functions and options.
 
 **Params**
 
-* `handler` **{Function}**
-* `returns` **{Object}**: Route instance for chaining
+* `pattern` **{string|regex}**
+* `fns` **{function|array}**: One or more middleware functions.
+* `options` **{object}**
 
 **Example**
 
 ```js
-route.all(function(file, next) {
-  file.data.title = 'Home';
-  next(null, file);
-});
-```
+const fn = file => file.count++;
+const Route = require('en-route').Route;
+const route = new Route('/(.*)', [fn, fn, fn]);
+const file = { path: '/foo', count: 0 };
 
-### [.handler](lib/route.js#L112)
-
-Add a middleware handler method for the given `name` to the route instance.
-
-**Params**
-
-* `method` **{String}**: Name of the handler method to add to the `route` instance.
-
-**Example**
-
-```js
-route.handler('before');
-route.handler('after');
-```
-
-### [.handlers](lib/route.js#L129)
-
-Add methods to the `route` instance for an array of middleware handlers.
-
-**Params**
-
-* `methods` **{Array}**: Method names to add to the `route` instance.
-
-**Example**
-
-```js
-route.handlers(['before', 'after']);
-```
-
-### [.match](lib/route.js#L150)
-
-Returns true if any layers in `route.stack` match the given `path`.
-
-**Params**
-
-* `path` **{String}**
-* `returns` **{Boolean}**
-
-**Example**
-
-```js
-console.log(route.match('foo/bar.js'));
-//=> true or false
-```
-
-### [.layer](lib/route.js#L171)
-
-Push a layer onto the stack for the given handler `method` and middleware `fn`.
-
-**Params**
-
-* `name` **{String}**: Layer name
-* `fn` **{Function}**: Middleware function
-
-**Example**
-
-```js
-route.layer('before', {}, function(){});
-route.layer('after', {}, [function(){}, function(){}]);
-route.layer('other', [function(){}, function(){}]);
-```
-
-### [Router](lib/router.js#L25)
-
-Initialize a new `Router` with the given `methods`.
-
-**Params**
-
-* `options` **{Object}**
-* `returns` **{Function}**: Returns a callable router function
-
-**Example**
-
-```js
-var router = new Router({methods: ['preRender', 'postRender']});
-```
-
-### [.route](lib/router.js#L59)
-
-Create a new Route for the given path. Each route contains a separate middleware stack.
-
-**Params**
-
-* `path` **{String}**
-* `returns` **{Object}** `Route`: for chaining
-
-**Example**
-
-```js
-var router = new Router();
-router.route('/foo')
-  .all(function(file, next) {
-    file.contents = new Buffer('foo');
-    next();
+route.handle(file)
+  .then(file => {
+    console.log(file.count); // 3
   });
 ```
 
-### [.method](lib/router.js#L82)
+### [.all](lib/route.js#L51)
 
-Add additional methods to the current router instance.
+Register a handler to be called on all layers on the route.
 
 **Params**
 
-* `methods` **{String|Array}**: New methods to add to the router.
-* `returns` **{Object}**: the router to enable chaining
+* `fn` **{function}**: Handler function
+* `returns` **{object}**: Route instance for chaining
 
 **Example**
 
 ```js
-var router = new Router();
-router.method('post');
-router.post('.hbs', function(file, next) {
-  next();
+route.all(file => {
+  file.data.title = 'Home';
 });
 ```
 
-### [.handler](lib/router.js#L100)
+### [.handle](lib/route.js#L69)
 
-Add a middleware handler `method` to the instance.
+Run a middleware stack on the given `file`.
 
 **Params**
 
-* `method` **{String}**: The name of the method to add
-* `returns` **{Object}**: Returns the instance for chaining
+* `file` **{object}**: File object
+* `returns` **{object}**: Callback that exposes `err` and `file`
+* `returns` **{object}**: Returns a promise with the file object.
 
 **Example**
 
 ```js
-router.handler('before');
-router.handler('after');
+route.handle(file)
+  .then()
 ```
 
-### [.handlers](lib/router.js#L123)
+### [.layer](lib/route.js#L99)
 
-Add an array of middleware handler `methods` to the instance.
+Push a layer onto the stack for a middleware functions.
 
 **Params**
 
-* `methods` **{Array}**: The method names to add
-* `returns` **{Object}**: Returns the instance for chaining
+* `pattern` **{string|regex}**: The pattern to use for matching files to determin if they should be handled.
+* `fn` **{function|array}**: Middleware functions
+* `returns` **{object}**: Route instance for chaining
 
 **Example**
 
 ```js
-router.handlers(['before', 'after']);
+route.layer(/foo/, file => {
+  // do stuff to file
+  file.layout = 'default';
+});
 ```
 
-### [.handle](lib/router.js#L148)
+### [.layers](lib/route.js#L118)
 
-Dispatch a file into the router.
+Push a layer onto the stack for one or more middleware functions.
 
 **Params**
 
-* `file` **{Object}**
-* `callback` **{Function}**
+* `pattern` **{string|regex}**
+* `fns` **{function|array}**: One or more middleware functions
+* `returns` **{object}**: Route instance for chaining
+
+**Example**
+
+```js
+route.layers(/foo/, function);
+route.layers(/bar/, [function, function]);
+```
+
+### [Route](lib/router.js#L19)
+
+Create a new `Router` with the given options.
+
+**Params**
+
+* `options` **{object}**
+
+**Example**
+
+```js
+const route = new Router({ handlers: ['preWrite', 'postWrite']});
+```
+
+### [.handler](lib/router.js#L37)
+
+Create a middleware handler method.
+
+**Params**
+
+* `method` **{string}**: Method name
+* `options` **{object}**
+* `returns` **{object}**: Returns the instance for chaining.
+
+### [.route](lib/router.js#L95)
+
+Create a new router instance with all handler methods bound to the given pattern.
+
+**Params**
+
+* `pattern` **{string}**
+* `returns` **{object}**: Returns a new router instance with handler methods bound to the given pattern.
+
+**Example**
+
+```js
+const router = new Router({ handlers: ['before', 'after'] });
+const file = { path: '/foo', content: '' };
+
+router.route('/foo')
+  .before(function(file) {
+    file.content += 'foo';
+  })
+  .after(function(file) {
+    file.content += 'bar';
+  });
+
+router.handle(file)
+  .then(() => {
+    assert.equal(file.content, 'foobar');
+  });
+```
+
+### [.handlers](lib/router.js#L118)
+
+Add one or more middleware handler methods. Handler methods may also be added by passing an array of handler names to the constructor on the `handlers` option.
+
+**Params**
+
+* `methods` **{string}**: Method names
+* `options` **{object}**
+* `returns` **{object}**: Returns the instance for chaining.
+
+**Example**
+
+```js
+router.handlers(['onLoad', 'preRender']);
+```
+
+### [.handle](lib/router.js#L149)
+
+Run a middleware methods on the given `file`.
+
+**Params**
+
+* `method` **{string|file}**: The handler method to call on `file`. If the first argument is a file object, all handlers will be called on the file.
+* `file` **{object}**: File object
+* `returns` **{Promise}**
+
+**Example**
+
+```js
+// run a specific method
+router.handle('onLoad', file)
+  .then(file => console.log('File:', file))
+  .catch(console.error);
+
+// run multiple methods
+router.handle('onLoad', file)
+  .then(file => router.handle('preRender', file))
+  .catch(console.error);
+
+// run all methods
+router.handle(file)
+  .then(file => console.log('File:', file))
+  .catch(console.error);
+```
+
+### [.all](lib/router.js#L177)
+
+Register all handler methods on the given file.
+
+**Params**
+
+* `file` **{object}**: File object
+* `returns` **{Promise}**
+
+**Example**
+
+```js
+router.all(file => {
+  file.data.title = 'Home';
+});
+```
+
+### [.mixin](lib/router.js#L197)
+
+Mix router methods onto the given object.
+
+**Params**
+
+* `target` **{object}**
 * `returns` **{undefined}**
 
 **Example**
 
 ```js
-router.dispatch(file, function(err) {
-  if (err) console.log(err);
-});
-```
-
-### [.use](lib/router.js#L257)
-
-Use the given middleware function, with optional path, defaulting to `/`. The other difference is that `route` path is stripped and not visible to the handler function. The main effect of this feature is that mounted handlers can operate without any code changes regardless of the `prefix` pathname.
-
-**Params**
-
-* `fn` **{Function}**: Middleware function
-* `returns` **{Object}**: Router instance for chaining
-
-**Example**
-
-```js
-var router = new Router();
-router.use(function(file, next) {
-  // do stuff to "file"
-  next();
-});
-```
-
-### [.param](lib/router.js#L320)
-
-Map the given param placeholder `name`(s) to the given callback.
-
-Parameter mapping is used to provide pre-conditions to routes
-which use normalized placeholders. For example a `:user_id` parameter
-could automatically load a user's information from the database without
-any additional code,
-The callback uses the same signature as middleware, the only difference
-being that the value of the placeholder is passed, in this case the _id_
-
-of the user. Once the `next()` function is invoked, just like middleware
-it will continue on to execute the route, or subsequent parameter functions.
-
-**Params**
-
-* `name` **{String}**: Paramter name
-* `fn` **{Function}**
-* `returns` **{Object}**: Router instance for chaining
-
-**Example**
-
-```js
-app.param('user_id', function(file, next, id) {
-  User.find(id, function(err, user) {
-    if (err) {
-      return next(err);
-    } else if (!user) {
-      return next(new Error('failed to load user'));
-    }
-    file.user = user;
-    next();
-  });
-});
+const router = new Router();
+const obj = {};
+router.handlers(['before', 'after']);
+router.mixin(obj);
+console.log(obj.before) //=> [function]
 ```
 
 ## Release history
+
+### v2.0.0
+
+**Breaking changes**
+
+* en-route was completely refactored from the ground-up.
 
 ### v1.0.0
 
@@ -319,27 +310,26 @@ app.param('user_id', function(file, next, id) {
 
 ## About
 
-### Related projects
-
-You might also be interested in these projects:
-
-* [assemble](https://www.npmjs.com/package/assemble): Get the rocks out of your socks! Assemble makes you fast at creating web projects… [more](https://github.com/assemble/assemble) | [homepage](https://github.com/assemble/assemble "Get the rocks out of your socks! Assemble makes you fast at creating web projects. Assemble is used by thousands of projects for rapid prototyping, creating themes, scaffolds, boilerplates, e-books, UI components, API documentation, blogs, building websit")
-* [base-routes](https://www.npmjs.com/package/base-routes): Plugin for adding routes support to your `base` application. Requires templates support to work. | [homepage](https://github.com/node-base/base-routes "Plugin for adding routes support to your `base` application. Requires templates support to work.")
-* [base](https://www.npmjs.com/package/base): Framework for rapidly creating high quality node.js applications, using plugins like building blocks | [homepage](https://github.com/node-base/base "Framework for rapidly creating high quality node.js applications, using plugins like building blocks")
-* [gulp-routes](https://www.npmjs.com/package/gulp-routes): Add middleware to run for specified routes in your gulp pipeline. | [homepage](https://github.com/assemble/gulp-routes "Add middleware to run for specified routes in your gulp pipeline.")
-
-### Contributing
+<details>
+<summary><strong>Contributing</strong></summary>
 
 Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](../../issues/new).
 
-### Contributors
+</details>
 
-| **Commits** | **Contributor** | 
-| --- | --- |
-| 68 | [jonschlinkert](https://github.com/jonschlinkert) |
-| 35 | [doowb](https://github.com/doowb) |
+<details>
+<summary><strong>Running Tests</strong></summary>
 
-### Building docs
+Running and reviewing unit tests is a great way to get familiarized with a library and its API. You can install dependencies and run tests with the following command:
+
+```sh
+$ npm install && npm test
+```
+
+</details>
+
+<details>
+<summary><strong>Building docs</strong></summary>
 
 _(This project's readme.md is generated by [verb](https://github.com/verbose/verb-generate-readme), please don't edit the readme directly. Any changes to the readme must be made in the [.verb.md](.verb.md) readme template.)_
 
@@ -349,31 +339,43 @@ To generate the readme, run the following command:
 $ npm install -g verbose/verb#dev verb-generate-readme && verb
 ```
 
-### Running tests
+</details>
 
-Running and reviewing unit tests is a great way to get familiarized with a library and its API. You can install dependencies and run tests with the following command:
+### Related projects
 
-```sh
-$ npm install && npm test
-```
+You might also be interested in these projects:
+
+* [assemble](https://www.npmjs.com/package/assemble): Get the rocks out of your socks! Assemble makes you fast at creating web projects… [more](https://github.com/assemble/assemble) | [homepage](https://github.com/assemble/assemble "Get the rocks out of your socks! Assemble makes you fast at creating web projects. Assemble is used by thousands of projects for rapid prototyping, creating themes, scaffolds, boilerplates, e-books, UI components, API documentation, blogs, building websit")
+* [base-routes](https://www.npmjs.com/package/base-routes): Plugin for adding routes support to your `base` application. Requires templates support to work. | [homepage](https://github.com/node-base/base-routes "Plugin for adding routes support to your `base` application. Requires templates support to work.")
+* [base](https://www.npmjs.com/package/base): Framework for rapidly creating high quality, server-side node.js applications, using plugins like building blocks | [homepage](https://github.com/node-base/base "Framework for rapidly creating high quality, server-side node.js applications, using plugins like building blocks")
+* [gulp-routes](https://www.npmjs.com/package/gulp-routes): Add middleware to run for specified routes in your gulp pipeline. | [homepage](https://github.com/assemble/gulp-routes "Add middleware to run for specified routes in your gulp pipeline.")
+
+### Contributors
+
+| **Commits** | **Contributor** | 
+| --- | --- |
+| 72 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 35 | [doowb](https://github.com/doowb) |
 
 ### Author
 
 **Brian Woodward**
 
-* [github/doowb](https://github.com/doowb)
-* [twitter/jonschlinkert](https://twitter.com/jonschlinkert)
+* [LinkedIn Profile](https://linkedin.com/in/jonschlinkert)
+* [GitHub Profile](https://github.com/doowb)
+* [Twitter Profile](https://twitter.com/jonschlinkert)
 
 **Jon Schlinkert**
 
-* [github/jonschlinkert](https://github.com/jonschlinkert)
-* [twitter/jonschlinkert](https://twitter.com/jonschlinkert)
+* [LinkedIn Profile](https://linkedin.com/in/jonschlinkert)
+* [GitHub Profile](https://github.com/jonschlinkert)
+* [Twitter Profile](https://twitter.com/jonschlinkert)
 
 ### License
 
-Copyright © 2017, [Jon Schlinkert](http://twitter.com/jonschlinkert).
+Copyright © 2018, [Jon Schlinkert](http://twitter.com/jonschlinkert).
 Released under the [MIT License](LICENSE).
 
 ***
 
-_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on August 07, 2017._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on March 21, 2018._

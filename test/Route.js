@@ -1,117 +1,135 @@
 'use strict';
 
-var assert = require('assert');
-var Router = require('..');
-var Route = Router.Route;
+const assert = require('assert');
+const Router = require('..');
+const Route = Router.Route;
 
 describe('Route', function() {
+  describe('handlers', function() {
+    it('should add handler', async function() {
+      const file = { path: '/', count: 0 };
+      const route = new Route('/', file => (file.count++));
+
+      return await route.handle(file)
+        .then(route.handle.bind(route))
+        .then(route.handle.bind(route))
+        .then(file => {
+          assert.equal(file.count, 3);
+        });
+    });
+  });
+
   describe('.all', function() {
-    it('should add handler', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('/foo');
+    it('should add handler', function() {
+      const file = { path: '/' };
+      const route = new Route('/foo');
 
-      route.all(function(file, next) {
+      route.all(function(file) {
         file.called = true;
-        next();
       });
 
-      route.dispatch(file, function(err) {
-        if (err) return cb(err);
-        assert(file.called);
-        cb();
-      });
+      return route.handle(file)
+        .then(file => {
+          assert(file.called);
+        });
     });
 
-    it('should stack', function(cb) {
-      var file = {count: 0, path: '/'};
-      var route = new Route('/foo');
+    it('should stack', function() {
+      const file = { count: 0, path: '/' };
+      const route = new Route('/foo');
 
-      route.all(function(file, next) {
+      route.all(function(file) {
         file.count++;
-        next();
       });
 
-      route.all(function(file, next) {
+      route.all(function(file) {
         file.count++;
-        next();
       });
 
-      route.dispatch(file, function(err) {
-        if (err) return cb(err);
-        assert.equal(file.count, 2);
-        cb();
-      });
+      return route.handle(file)
+        .then(file => {
+          assert.equal(file.count, 2);
+        });
     });
   });
 
   describe('errors', function() {
-    it('should handle errors via arity 3 functions', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('');
+    it('should handle errors', function() {
+      const file = { path: '/' };
+      const route = new Route();
+      const msg = 'this is an error!';
 
-      route.all(function(file, next) {
-        next(new Error('foobar'));
+      route.all(function(file) {
+        throw new Error(msg);
       });
 
-      route.all(function(file, next) {
-        next();
-      });
-
-      route.dispatch(file, function(err) {
-        assert(err);
-        assert.equal(err.message, 'foobar');
-        cb();
-      });
+      return route.handle(file)
+        .then(function() {
+          throw new Error('expected an error');
+        })
+        .catch(err => {
+          assert.equal(err.message, msg);
+        });
     });
 
-    it('should handle throw', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('');
+    it('should stop handling middleware wher an error is returned', function() {
+      const file = { path: '/' };
+      const route = new Route();
+      const msg = 'this is an error!';
 
-      route.all(function(file, next) {
-        throw new Error('foobar');
+      route.all(function(file) {
+        return Promise.reject(new Error(msg));
       });
 
-      route.all(function(file, next) {
-        next();
+      route.all(function(file) {
+        file.path = 'foo';
       });
 
-      route.dispatch(file, function(err) {
-        assert(err);
-        assert.equal(err.message, 'foobar');
-        cb();
-      });
+      return route.handle(file)
+        .then(function() {
+          throw new Error('expected an error');
+        })
+        .catch(err => {
+          assert.equal(file.path, '/');
+          assert.equal(err.message, msg);
+        });
     });
 
-    it('should handle throw in .all', function(cb) {
-      var file = {path: '/'};
-      var route = new Route('');
+    it('should handle throw', function() {
+      const file = { path: '/' };
+      const route = new Route();
+      const msg = 'this is an error!';
 
-      route.all(function(file, next) {
-        throw new Error('boom!');
+      route.all(function(file) {
+        throw new Error(msg);
       });
 
-      route.dispatch(file, function(err) {
-        assert(err);
-        assert.equal(err.message, 'boom!');
-        cb();
+      route.all(function(file) {
+        // should not call this function
+        file.path = 'foo';
       });
+
+      return route.handle(file)
+        .then(function() {
+          throw new Error('expected an error');
+        })
+        .catch(err => {
+          assert.equal(file.path, '/');
+          assert.equal(err.message, msg);
+        });
     });
   });
 
   describe('with parameterized path', function() {
-    var route = new Route('/blog/:year/:month/:day/:slug').all([
-      function() {}
-    ]);
+    const route = new Route('/blog/:year/:month/:day/:slug').all([() => {}, () => {}]);
 
-    it('should have path property', function() {
-      assert.equal(route.path, '/blog/:year/:month/:day/:slug');
+    it('should have pattern property', function() {
+      assert.equal(route.pattern, '/blog/:year/:month/:day/:slug');
     });
 
     it('should have stack property', function() {
       assert(Array.isArray(route.stack));
-      assert.equal(route.stack.length, 1);
+      assert.equal(route.stack.length, 2);
     });
   });
 });
-

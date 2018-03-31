@@ -1,361 +1,242 @@
 'use strict';
 
-var Router = require('../');
-var after = require('after');
-var assert = require('assert');
+const assert = require('assert');
+const Router = require('..');
 
-describe('Router', function() {
-  it('should return a function with router methods', function() {
-    var router = Router();
-    assert.equal(typeof router, 'function');
-
-    var router = new Router();
-    assert.equal(typeof router, 'function');
-    assert.equal(typeof router.handle, 'function');
-    assert.equal(typeof router.use, 'function');
-  });
-
-  it('should support .use of other routers', function(cb) {
-    var router = new Router();
-    var another = new Router();
-
-    another.all('/bar', function(file, next) {
-      next();
+describe('handlers', function() {
+  describe('constructor options', function() {
+    it('should return a Router with the handlers defined on the options', function() {
+      const router = new Router({ handlers: ['before', 'after'] });
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+      assert.equal(typeof router.after, 'function');
     });
 
-    router.use('/foo', another);
-    router.handle({
-      path: '/foo/bar'
-    }, cb);
-  });
+    it('should return a Router with specific original handlers then allow adding additional handlers', function() {
+      const router = new Router({ handlers: ['before', 'after'] });
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+      assert.equal(typeof router.after, 'function');
+      assert.equal(typeof router.additional, 'undefined');
 
-  it('should support dynamic routes', function(cb) {
-    var router = new Router();
-    var another = new Router();
-
-    another.all('/:bar', function(file, next) {
-      assert.equal(file.options.params.bar, 'route');
-      next();
+      router.handler('additional');
+      assert.equal(typeof router.additional, 'function');
     });
 
-    router.use('/:foo', another);
-    var file = {path: '/test/route'};
-    router.handle(file, cb);
+    it('should support dynamic routes on handlers', function() {
+      const router = new Router({ handlers: ['before'] });
+      const another = new Router({ handlers: ['before'] });
+
+      another.before('/:bar', function(file) {
+        assert(file.routes.params.bar, 'route');
+      });
+
+      return router.handle({path: '/test/route', routes: { method: 'before' }});
+    });
   });
 
-  it('should handle blank path', function(cb) {
-    var router = new Router();
+  describe('.mixin', function() {
+    it('should mix handler methods onto the given object', function() {
+      const router = new Router();
+      const obj = {};
+      router.handlers(['before', 'after']);
+      router.mixin(obj);
+      assert.equal(typeof obj.all, 'function');
+      assert.equal(typeof obj.before, 'function');
+      assert.equal(typeof obj.after, 'function');
+    });
+  });
 
-    router.use(function(file, next) {
-      false.should.be.true;
-      next();
+  describe('.handlers', function() {
+    it('should register an array of handlers', function() {
+      const router = new Router();
+      router.handlers(['before', 'after']);
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+      assert.equal(typeof router.after, 'function');
     });
 
-    router.handle({path: ''}, cb);
+    it('should register an single handler', function() {
+      const router = new Router();
+      router.handlers('before');
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+    });
+  });
+
+  describe('.handler', function() {
+    it('should register an array of handlers', function() {
+      const router = new Router();
+      router.handler(['before', 'after']);
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+      assert.equal(typeof router.after, 'function');
+    });
+
+    it('should register an single handler', function() {
+      const router = new Router();
+      router.handler('before');
+      assert.equal(typeof router.all, 'function');
+      assert.equal(typeof router.before, 'function');
+    });
+
+    it('should throw an error when value is not an array or string', function() {
+      const router = new Router();
+      assert.throws(() => router.handler(), /expected/);
+    });
   });
 
   describe('.handle', function() {
-    it('should dispatch', function(cb) {
-      var router = new Router();
-      var file = {path: '/foo'};
+    it('should throw an error when method does not exist', function() {
+      const router = new Router();
+      return router.handle('flsflskjsk')
+        .catch(err => {
+          assert(/exist/.test(err.message));
+        });
+    });
 
-      router.route('/foo')
-        .all(function(file, next) {
-          file.content = 'foo';
-          next();
+    it('should dispatch to handlers', function() {
+      const router = new Router({ handlers: ['before', 'after'] });
+      const file = { path: '/foo', content: '' };
+
+      const foo = router.route('/foo')
+        .before(function(file) {
+          file.content += 'foo';
+        })
+        .after(function(file) {
+          file.content += 'bar';
         });
 
-      router.handle(file, function(err) {
-        assert.equal(file.content, 'foo');
-        cb();
-      });
+      return foo.handle(file)
+        .then(() => {
+          assert.equal(file.content, 'foobar');
+        });
+    });
+
+    it('should not dispatch to handlers that do not match', function() {
+      const router = new Router({ handlers: ['before'] });
+      const file = { path: '/bar' };
+
+      const route = router.route('/foo')
+        .before(function(file) {
+          file.content = 'foo';
+        });
+
+      return route.handle(file)
+        .then(() => {
+          assert.equal(file.content, undefined);
+        });
+    });
+
+    it('should register a layer for each pattern specified on the route', function() {
+      const router = new Router({ handlers: ['before'] });
+      const file = { path: '/bar' };
+
+      const route = router.route(['/foo', '/bar'])
+        .before(function(file) {
+          file.content = 'bar';
+        });
+
+      return route.handle(file)
+        .then(() => {
+          assert.equal(file.content, 'bar');
+        });
+    });
+
+    it('should dispatch to dynamic handlers', function() {
+      const router = new Router({ handlers: ['before'] });
+      const file = { path: '/foo' };
+
+      router.handler('additional');
+
+      const foo = router.route('/foo')
+        .additional(function(file) {
+          file.content = 'foo';
+        });
+
+      return foo.handle(file)
+        .then(() => {
+          assert(file.content, 'foo');
+        });
     });
   });
 
   describe('.multiple callbacks', function() {
-    it('should throw if a callback is not a function', function() {
+    it('should throw if a callback is null on a method', function() {
       assert.throws(function() {
-        var router = new Router();
-        router.route('/foo').all(null);
-      });
-      assert.throws(function() {
-        var router = new Router();
-        router.route('/foo').all(undefined);
-      });
-      assert.throws(function() {
-        var router = new Router();
-        router.route('/foo').all('not a function');
-      });
+        const router = new Router({handlers: ['before'] });
+        router.route('/foo').before(null);
+      }, /expected handler to be a function/);
     });
 
-    it('should support chained calls', function() {
-      var router = new Router();
-      router.route('/foo')
-        .all(function(file, next) {
-          next();
-        })
-        .all(function(file, next) {
-          next();
-        });
+    it('should throw if a callback is undefined on a method', function() {
+      assert.throws(function() {
+        const router = new Router({handlers: ['before'] });
+        router.route('/foo').before(undefined);
+      }, /expected handler to be a function/);
+    });
+
+    it('should throw if a callback is not a function on a method', function() {
+      assert.throws(function() {
+        const router = new Router({ handlers: ['before'] });
+        router.route('/foo').before('not a function');
+      }, /expected handler to be a function/);
+    });
+
+    it('should not throw if all callbacks are functions on a method', function() {
+      const router = new Router({ handlers: ['before'] });
+      return router.route('/foo')
+        .before(() => {});
     });
   });
 
   describe('error', function() {
-    it('should skip non error middleware', function(cb) {
-      var router = new Router();
+    it('should skip non error middleware on a method', function() {
+      const router = new Router({ handlers: ['before'] });
 
-      router.all('/foo', function(file, next) {
-        next(new Error('foo'));
+      router.before('/foo', function(file) {
+        throw new Error('foo');
       });
 
-      router.all('/bar', function(file, next) {
-        next(new Error('bar'));
+      router.before('/bar', function(file) {
+        throw new Error('bar');
       });
 
-      router.use(function(file, next) {
-        assert(false);
-      });
-
-      router.handle({path: '/foo'}, function(err) {
-        assert(err);
-        assert.equal(err.message, 'foo');
-        cb();
-      });
-    });
-
-    it('should handle throwing inside routes with params', function(cb) {
-      var router = new Router();
-
-      router.all('/foo/:id', function(file, next) {
-        throw new Error('arbitrary');
-      });
-
-      router.use(function(file, next) {
-        assert(false);
-      });
-
-      router.handle({path: '/foo/2'}, function(err) {
-        assert.equal(err.message, 'arbitrary');
-        cb();
-      });
-    });
-
-    it('should handle throwing in handler after async param', function(cb) {
-      var router = new Router();
-
-      router.param('user', function(file, next, val) {
-        process.nextTick(function() {
-          file.user = val;
-          next();
+      return router.handle({ path: '/foo' })
+        .catch(function(err) {
+          assert.equal(err.message, 'foo');
         });
-      });
-
-      router.use('/:user', function(file, next) {
-        throw new Error('oh no!');
-      });
-
-      router.handle({
-        path: '/bob'
-      }, function(err) {
-        assert.equal(err.message, 'oh no!');
-        cb();
-      });
     });
 
-    it('should handle throwing inside error handlers', function(cb) {
-      var router = new Router();
+    it('should handle throwing inside routes with params on a method', function() {
+      const router = new Router({ handlers: ['before'] });
 
-      router.use(function(file, next) {
-        throw new Error('boom!');
+      router.before('/foo/:id', function(file) {
+        throw new Error('foo');
       });
 
-      router.handle({path: '/'}, function(err) {
-        assert.equal(err.message, 'boom!');
-        cb();
-      });
+      return router.handle({ path: '/foo/2' })
+        .catch(err => {
+          assert.equal(err.message, 'foo');
+        });
     });
   });
 
-  describe('.use', function() {
-    it('should require arguments', function() {
-      var router = new Router();
-      assert.throws(function() {
-        router.use.bind(router)();
-      });
-    });
+  describe('params', function() {
+    it('should expose params as second argument on middleware', function() {
+      const called = [];
+      const file = { path: '/foo/123/bar', routes: { method: 'before' } };
+      const router = new Router({ handlers: ['before'] });
 
-    it('should not accept non-functions', function() {
-      var router = new Router();
-      assert.throws(function() {
-        router.use.bind(router, '/', 'hello')();
-      });
-      assert.throws(function() {
-        router.use.bind(router, '/', 5)();
-      });
-      assert.throws(function() {
-        router.use.bind(router, '/', null)();
-      });
-      assert.throws(function() {
-        router.use.bind(router, '/', new Date())();
-      });
-    });
-
-    it('should accept array of middleware', function(cb) {
-      var count = 0;
-      var router = new Router();
-
-      function fn1(file, next) {
-        assert.equal(++count, 1);
-        next();
-      }
-
-      function fn2(file, next) {
-        assert.equal(++count, 2);
-        next();
-      }
-
-      router.use([fn1, fn2], function(file) {
-        assert.equal(++count, 3);
-        cb();
+      router.before('/foo/:id/bar', function(file, params) {
+        assert.equal(params.id, '123');
+        called.push('before');
       });
 
-      router.handle({
-        path: '/foo'
-      }, function() {
-      });
-    });
-  });
-
-  describe('.param', function() {
-    it('should call param function when routing', function(cb) {
-      var router = new Router();
-
-      router.param('id', function(file, next, id) {
-        assert.equal(id, '123');
-        next();
-      });
-
-      router.all('/foo/:id/bar', function(file, next) {
-        assert.equal(file.options.params.id, '123');
-        next();
-      });
-
-      router.handle({
-        path: '/foo/123/bar'
-      }, cb);
-    });
-
-    it('should call param function when routing middleware', function(cb) {
-      var router = new Router();
-
-      router.param('id', function(file, next, id) {
-        assert.equal(id, '123');
-        next();
-      });
-
-      router.use('/foo/:id/bar', function(file, next) {
-        assert.equal(file.options.params.id, '123');
-        assert.equal(file.path, '/baz');
-        next();
-      });
-
-      router.handle({path: '/foo/123/bar/baz'}, cb);
-    });
-
-    it('should only call once per request', function(cb) {
-      var count = 0;
-      var file = {path: '/foo/bob/bar'};
-      var router = new Router();
-      var sub = new Router();
-
-      sub.all('/bar', function(file, next) {
-        next();
-      });
-
-      router.param('user', function(file, next, user) {
-        count++;
-        file.user = user;
-        next();
-      });
-
-      router.use('/foo/:user/', new Router());
-      router.use('/foo/:user/', sub);
-
-      router.handle(file, function(err) {
-        if (err) return cb(err);
-        assert.equal(count, 1);
-        assert.equal(file.user, 'bob');
-        cb();
-      });
-    });
-
-    it('should call when values differ', function(cb) {
-      var count = 0;
-      var file = {path: '/foo/bob/bar'};
-      var router = new Router();
-      var sub = new Router();
-
-      sub.all('/bar', function(file, next) {
-        next();
-      });
-
-      router.param('user', function(file, next, user) {
-        count++;
-        file.user = user;
-        next();
-      });
-
-      router.use('/foo/:user/', new Router());
-      router.use('/:user/bob/', sub);
-
-      router.handle(file, function(err) {
-        if (err) return cb(err);
-        assert.equal(count, 2);
-        assert.equal(file.user, 'foo');
-        cb();
-      });
-    });
-  });
-
-  describe('parallel requests', function() {
-    it('should not mix requests', function(cb) {
-      var file1 = {
-        path: '/foo/50/bar'
-      };
-      var file2 = {
-        path: '/foo/10/bar'
-      };
-      var router = new Router();
-      var sub = new Router();
-
-      cb = after(2, cb);
-
-      sub.all('/bar', function(file, next) {
-        next();
-      });
-
-      router.param('ms', function(file, next, ms) {
-        ms = parseInt(ms, 10);
-        file.ms = ms;
-        setTimeout(next, ms);
-      });
-
-      router.use('/foo/:ms/', new Router());
-      router.use('/foo/:ms/', sub);
-
-      router.handle(file1, function(err) {
-        assert.ifError(err);
-        assert.equal(file1.ms, 50);
-        assert.equal(file1.options.originalPath, '/foo/50/bar');
-        cb();
-      });
-
-      router.handle(file2, function(err) {
-        assert.ifError(err);
-        assert.equal(file2.ms, 10);
-        assert.equal(file2.options.originalPath, '/foo/10/bar');
-        cb();
-      });
+      return router.handle(file)
+        .then(function() {
+          assert.equal(called[0], 'before');
+        });
     });
   });
 });

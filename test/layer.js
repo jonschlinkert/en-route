@@ -31,17 +31,27 @@ describe('Layer', function() {
 
     it('should cache regex patterns', function() {
       const layer = new Layer(/\/foo/, () => {});
-      assert.equal(typeof layer.regexp, 'undefined');
+      assert.equal(typeof layer._regex, 'undefined');
       layer.match('/foo');
       layer.match('/foo');
       layer.match('/foo');
       layer.match('/foo');
-      assert.equal(typeof layer.regexp, 'object');
+      assert.equal(typeof layer._regex, 'object');
     });
 
     it('should match params', function() {
       const layer = new Layer('/:name', () => {});
       assert.deepEqual(layer.match('/foo'), { name: 'foo' });
+    });
+
+    it('should take an array of patterns', function() {
+      const layer = new Layer(['/:name/ccc', '/:name/bbb'], () => {});
+      assert.deepEqual(layer.match('/aaa/bbb'), { name: 'aaa' });
+    });
+
+    it('should take a regex pattern', function() {
+      const layer = new Layer(/\/(.*?)\/(bbb)/, () => {});
+      assert.deepEqual(layer.match('/aaa/bbb'), { 0: 'aaa', 1: 'bbb' });
     });
 
     it('should return null when no path is given', function() {
@@ -56,6 +66,36 @@ describe('Layer', function() {
       assert.equal(params[0], path.dirname(__dirname));
       assert.equal(params.parent, 'test');
       assert.equal(params.folder, 'foo');
+    });
+  });
+
+  describe('.handle', function() {
+    it('should handle a file asynchronously', function() {
+      const handler = file => {
+        return new Promise(resolve => {
+          setTimeout(function() {
+            file.handled = true;
+            resolve();
+          }, 5);
+        });
+      };
+
+      const layer = new Layer('/foo', handler);
+      return layer.handle({ path: '/foo' })
+        .then(file => {
+          assert.equal(file.handled, true);
+        });
+    });
+
+    it('should handle a file synchronously', function() {
+      const handler = file => {
+        file.handled = true;
+      };
+
+      const layer = new Layer('/foo', handler, { sync: true });
+      const file = { path: '/foo' };
+      layer.handle(file);
+      assert.equal(file.handled, true);
     });
   });
 

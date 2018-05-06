@@ -1,13 +1,10 @@
 console.time('Runtime');
-console.time('router');
+console.time('init');
 const Router = require('..');
 const router = new Router();
-const file = { path: 'templates/pages/index.hbs', count: 0 }
-console.timeEnd('router');
+console.timeEnd('init');
 
 router.handlers(['onLoad']);
-router.on('handle', console.log);
-router.on('layer', console.log);
 
 router
   .onLoad(/./, file => (file.count++))
@@ -15,8 +12,13 @@ router
   .onLoad(/./, file => (file.count++))
   .onLoad(/./, file => (file.count++))
   .onLoad(/./, file => (file.count++))
+  .onLoad(/./, file => (file.count++))
+  .onLoad(/./, file => (file.count++))
+  .onLoad(/./, file => (file.count++))
+  .onLoad(/./, file => (file.count++))
+  .onLoad(/./, file => (file.count++))
 
-router.handle('onLoad', file)
-  .then(file => console.log('Count:', file.count))
-  .then(() => console.timeEnd('Runtime'))
+router.handle('onLoad', { path: 'templates/pages/index.hbs', count: 0 })
+  .then(file => console.log('file.count:', file.count))
+  .then(() => console.timeEnd('Total runtime'))
   .catch(console.error);

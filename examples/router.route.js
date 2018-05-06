@@ -1,9 +1,10 @@
+const File = require('./file');
 const Router = require('..');
 const router = new Router({ handlers: ['one', 'two'] });
-const foo = { path: '/foo', content: 'abc' };
-const bar = { path: '/bar', content: 'abc' };
-const baz = { path: '/baz', content: 'abc' }
-const qux = { path: '/qux', content: 'abc' }
+const foo = new File({ path: '/foo', content: 'abc' });
+const bar = new File({ path: '/bar', content: 'abc' });
+const baz = new File({ path: '/baz', content: 'abc' });
+const qux = new File({ path: '/qux', content: 'abc' });
 
 const route = router.route(/./)
   .one(function(file) {
@@ -17,5 +18,5 @@ route.handle(foo)
   .then(() => route.handle(bar))
   .then(() => route.handle(baz))
   .then(() => route.handle(qux))
-  .then(file => console.log(file, foo.content, bar.content, baz.content, qux.content))
+  .then(file => console.log(file === qux, foo, bar, baz, qux))
   .catch(console.error);

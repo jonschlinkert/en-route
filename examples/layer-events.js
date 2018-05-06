@@ -1,8 +1,7 @@
+const File = require('./file');
 const Router = require('..');
 const router = new Router({ handlers: ['one', 'two'] });
-const file = { path: '/foo', content: 'abc' };
-
-
+const file = new File({ path: '/foo', content: 'abc' });
 
 const route = router.route('/foo')
   .one(function(file) {
@@ -12,7 +11,9 @@ const route = router.route('/foo')
     file.content += 'bar';
   });
 
-route.on('layer', (method, file, route) => console.log('METHOD:', method, route));
+route.on('layer', (method, file, route) => {
+  console.log('METHOD:', method, route);
+});
 
 route.handle(file)
   .then(() => console.log(file.content))

@@ -1,7 +1,7 @@
+const File = require('./file');
 const Router = require('..');
-const File = require('vinyl');
-const file = new File({ path: 'foo/bar/index.js' });
 const router = new Router();
+const file = new File({ path: 'foo/bar/index.js' });
 
 router.handler(['onLoad', 'preRender', 'postRender']);
 router.on('preHandle', (method, file) => console.log(`Before ${method}:`, file));
@@ -11,11 +11,10 @@ let n = 0;
 const wait = (fn, timeout = 500) => {
   return file => {
     console.log();
-    console.log('before', ++n);
+    console.log(`before ${++n}:`, file);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         console.log(`after ${n}:`, file);
-        console.log();
         fn(file);
         resolve(file);
       }, timeout);
@@ -28,7 +27,7 @@ router
     console.log('Params:', params);
     file.extname = '.md';
   })
-  .preRender(/./, console.log.bind(console, 'preRender:'))
+  .preRender('(.*)', console.log.bind(console, 'preRender:'))
   .onLoad(/not-a-match/, file => {
     throw new Error('should not match');
   });

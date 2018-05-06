@@ -28,15 +28,10 @@
   "scripts": {
     "test": "nyc --reporter=text --reporter=html mocha"
   },
-  "dependencies": {
-    "@sellside/emitter": "^1.2.1",
-    "path-to-regexp": "^2.2.0"
-  },
   "devDependencies": {
     "gulp-format-md": "^1.0.0",
     "mocha": "^3.5.3",
-    "nyc": "^11.6.0",
-    "vinyl": "^2.1.0"
+    "nyc": "^11.6.0"
   },
   "keywords": [
     "assemble",

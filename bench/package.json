@@ -1,0 +1,18 @@
+{
+  "name": "benchmarks",
+  "private": true,
+  "lintDeps": {
+    "devDependencies": {
+      "files": {
+        "patterns": [
+          "*.js"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "ansi": "^0.3.1",
+    "benchmark": "^2.1.4",
+    "minimist": "^1.2.0"
+  }
+}

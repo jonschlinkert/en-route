@@ -1,9 +1,10 @@
-const handle = file => file.count++;
+const File = require('./file');
 const Route = require('../lib/route');
+
+const handle = file => file.count++;
 const route = new Route('/(.*)', [handle, handle, handle]);
-const file = { path: '/foo', count: 0 };
+const file = new File({ path: '/foo', count: 0 });
 
 route.handle(file)
-  .then(file => {
-    console.log(file.count); // 3
-  });
+  .then(file => console.log('Count:', file.count))
+  .catch(console.error);

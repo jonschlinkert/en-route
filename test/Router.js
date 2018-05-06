@@ -95,6 +95,17 @@ describe('handlers', function() {
         });
     });
 
+    it('should throw an error when method does not exist', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz' ]});
+
+      return router.handle('flsflskjsk')
+        .catch(err => {
+          assert(/exist/.test(err.message));
+        });
+    });
+  });
+
+  describe('.route', function() {
     it('should dispatch to handlers', function() {
       const router = new Router({ handlers: ['before', 'after'] });
       const file = { path: '/foo', content: '' };
@@ -158,6 +169,118 @@ describe('handlers', function() {
         .then(() => {
           assert(file.content, 'foo');
         });
+    });
+  });
+
+  describe('.all', function() {
+    it('should run all handlers on the given file', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz'] });
+      const file = { path: '/abc', methods: [] };
+
+      router.foo('/abc', file => {
+        file.methods.push('foo');
+      });
+      router.bar('/abc', file => {
+        file.methods.push('bar');
+      });
+      router.baz('/abc', file => {
+        file.methods.push('baz');
+      });
+
+      return router.all(file)
+        .then(() => {
+          assert.deepEqual(file.methods, ['foo', 'bar', 'baz']);
+        });
+    });
+
+    it('should run all handlers in series', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz'] });
+      const file = { path: '/abc', methods: [] };
+
+      function timeout(name, delay) {
+        return file => {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              file.methods.push(name);
+              resolve();
+            }, delay);
+          });
+        }
+      }
+
+      router.foo('/abc', timeout('foo', 10));
+      router.bar('/abc', timeout('bar', 5));
+      router.baz('/abc', timeout('baz', 1));
+
+      return router.all(file)
+        .then(() => {
+          assert.deepEqual(file.methods, ['foo', 'bar', 'baz']);
+        });
+    });
+
+    it('should run all handlers on the given file when options.parallel is true', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz'], parallel: true });
+      const file = { path: '/abc', methods: [] };
+
+      router.foo('/abc', file => {
+        file.methods.push('foo');
+      });
+      router.bar('/abc', file => {
+        file.methods.push('bar');
+      });
+      router.baz('/abc', file => {
+        file.methods.push('baz');
+      });
+
+      return router.all(file)
+        .then(() => {
+          assert.deepEqual(file.methods, ['foo', 'bar', 'baz']);
+        });
+    });
+
+    it('should run all handlers in parallel', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz'], parallel: true });
+      const file = { path: '/abc', methods: [] };
+
+      function timeout(name, delay) {
+        return file => {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              file.methods.push(name);
+              resolve();
+            }, delay);
+          });
+        }
+      }
+
+      router.foo('/abc', timeout('foo', 10));
+      router.bar('/abc', timeout('bar', 5));
+      router.baz('/abc', timeout('baz', 1));
+
+      return router.all(file)
+        .then(() => {
+          assert.deepEqual(file.methods, ['baz', 'bar', 'foo']);
+        });
+    });
+  });
+
+  describe('.all', function() {
+    it('should run all handlers on the given file synchronously', function() {
+      const router = new Router({ handlers: ['foo', 'bar', 'baz'], sync: true });
+      const file = { path: '/abc', methods: [] };
+
+      router.foo('/abc', file => {
+        file.methods.push('foo');
+      });
+      router.bar('/abc', file => {
+        file.methods.push('bar');
+      });
+      router.baz('/abc', file => {
+        file.methods.push('baz');
+      });
+
+      router.all(file);
+      assert.deepEqual(file.methods, ['foo', 'bar', 'baz']);
     });
   });
 

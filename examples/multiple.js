@@ -1,22 +1,21 @@
 const Router = require('..');
-const File = require('vinyl');
+const File = require('./file');
 const file = new File({ path: 'templates/pages/index.hbs' });
 const router = new Router();
 
-router.handler(['onLoad', 'preRender', 'postRender', 'preWrite', 'postWrite']);
-router.on('preHandle', (method, file) => console.log(`Before ${method}:`, file));
-router.on('postHandle', (method, file) => console.log(`After ${method}:`, file));
+router.handler(['foo', 'bar', 'baz', 'qux', 'fez']);
+router.on('handle', (method, file) => console.log(method, file));
 
 router
-  .onLoad(/\.hbs$/, file => (file.extname = '.html'))
-  .onLoad(/\.html$/, file => (file.stem = 'foo'))
-  .preRender(/\.html$/, file => (file.stem = 'bar'))
-  .postRender(/\.html$/, file => (file.stem = 'baz'))
-  .preWrite(/./, () => {}) //<= shouldn't run this
-  .postWrite(/./, () => {}); //<= shouldn't run this
+  .foo(/\.hbs$/, file => (file.extname = '.html'))
+  .foo(/\.html$/, file => (file.stem = 'foo'))
+  .bar(/\.html$/, file => (file.stem = 'bar'))
+  .baz(/\.html$/, file => (file.stem = 'baz'))
+  .qux(/./, () => {}) //<= shouldn't run this
+  .fez(/./, () => {}); //<= shouldn't run this
 
-router.handle('onLoad', file)
-  .then(file => router.handle('preRender', file))
-  .then(file => router.handle('postRender', file))
+router.handle('foo', file)
+  .then(file => router.handle('bar', file))
+  .then(file => router.handle('baz', file))
   .then(file => console.log('Done:', file))
   .catch(console.error);

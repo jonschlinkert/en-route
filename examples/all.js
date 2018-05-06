@@ -1,10 +1,10 @@
 const Router = require('..');
-const File = require('vinyl');
+const File = require('./file');
 const file = new File({ path: 'templates/pages/index.hbs' });
-const router = new Router({ handlers: ['onLoad', 'preRender', 'postRender'] });
+const router = new Router({ handlers: ['foo', 'bar'] });
 
-router.onLoad(/./, file => console.log('onLoad:', file));
-router.preRender(/./, file => console.log('preRender:', file));
+router.foo(/./, file => console.log('foo:', file));
+router.bar(/./, file => console.log('bar:', file));
 
 router.all(file)
   .then(file => console.log('Done:', file))

@@ -6,7 +6,7 @@ const Route = Router.Route;
 
 describe('Route', function() {
   describe('handlers', function() {
-    it('should add handler', async function() {
+    it('should add a handler', async function() {
       const file = { path: '/', count: 0 };
       const route = new Route('/', file => (file.count++));
 
@@ -19,8 +19,82 @@ describe('Route', function() {
     });
   });
 
+  describe('.handle', function() {
+    it('should handle a file', function() {
+      const fn = file => file.count++;
+      const route = new Route('/(.*)', [fn, fn, fn]);
+      const file = { path: '/foo', count: 0 };
+
+      return route.handle(file)
+        .then(() => {
+          assert.equal(file.count, 3);
+        });
+    });
+
+    it('should return the file in the promise', function() {
+      const fn = file => file.count++;
+      const route = new Route('/(.*)', [fn, fn, fn]);
+
+      return route.handle({ path: '/foo', count: 0 })
+        .then(file => {
+          assert.equal(file.count, 3);
+        });
+    });
+
+    it('should run in series', function() {
+      const fn = (name, delay) => {
+        return file => {
+          return new Promise(resolve => {
+            setTimeout(function() {
+              file.names.push(name);
+              resolve();
+            }, delay);
+          });
+        };
+      };
+
+      const fns = [fn('a', 10), fn('b', 5), fn('c', 1)];
+      const route = new Route('/(.*)', fns);
+
+      return route.handle({ path: '/foo', names: [] })
+        .then(file => {
+          assert.deepEqual(file.names, ['a', 'b', 'c']);
+        });
+    });
+
+    it('should run in parallel', function() {
+      const fn = (name, delay) => {
+        return file => {
+          return new Promise(resolve => {
+            setTimeout(function() {
+              file.names.push(name);
+              resolve();
+            }, delay);
+          });
+        };
+      };
+
+      const fns = [fn('a', 10), fn('b', 5), fn('c', 1)];
+      const route = new Route('/(.*)', fns, { parallel: true });
+
+      return route.handle({ path: '/foo', names: [] })
+        .then(file => {
+          assert.deepEqual(file.names, ['c', 'b', 'a']);
+        });
+    });
+
+    it('should run in synchronously', function() {
+      const fn = name => file => file.names.push(name);
+      const fns = [fn('a'), fn('b'), fn('c')];
+      const route = new Route('/(.*)', fns, { sync: true });
+      const file = { path: '/foo', names: [] };
+      route.handle(file);
+      assert.deepEqual(file.names, ['a', 'b', 'c']);
+    });
+  });
+
   describe('.all', function() {
-    it('should add handler', function() {
+    it('should add a handler', function() {
       const file = { path: '/' };
       const route = new Route('/foo');
 
@@ -34,7 +108,7 @@ describe('Route', function() {
         });
     });
 
-    it('should stack', function() {
+    it('should add a function to the stack each time all is called', function() {
       const file = { count: 0, path: '/' };
       const route = new Route('/foo');
 
@@ -45,6 +119,25 @@ describe('Route', function() {
       route.all(function(file) {
         file.count++;
       });
+
+      return route.handle(file)
+        .then(file => {
+          assert.equal(file.count, 2);
+        });
+    });
+
+    it('should take an array of functions', function() {
+      const file = { count: 0, path: '/' };
+      const route = new Route('/foo');
+
+      route.all([
+        function(file) {
+          file.count++;
+        },
+        function(file) {
+          file.count++;
+        }
+      ]);
 
       return route.handle(file)
         .then(file => {

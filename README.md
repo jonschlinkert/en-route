@@ -12,30 +12,134 @@ Install with [npm](https://www.npmjs.com/):
 $ npm install --save en-route
 ```
 
+## How it works
+
+en-route is a different, but similar concept to routes you might be familiar with, like express routes. The general idea is, you can:
+
+1. Use middleware to modify file objects
+2. Define routes, to determine whether or not a middleware function should run on a given file.
+3. Define [handlers](#handlers) for running specific middleware at specific points in your application or build.
+
+See the [examples folder](./examples) for a number of different examples of how en-route works.
+
+## Usage
+
+```js
+const Router = require('en-route');
+const router = new Router();
+```
+
 ## API
 
-### [Layer](lib/layer.js#L22)
+### [Router](lib/router.js#L20)
 
-Create a new `Layer` with the given `pattern`, handler function and options.
+Create a new `Router` with the given options.
 
 **Params**
 
-* `pattern` **{string}**
-* `handler` **{function}**
 * `options` **{object}**
 
 **Example**
 
 ```js
-const layer = new Layer('/', file => {
-  // do stuff to file
-  file.extname = '.html';
-});
+// initialize a router with handler methdods
+const router = new Router({ handlers: ['preWrite', 'postWrite'] });
 ```
 
-### [.handle](lib/layer.js#L50)
+### [.handlers](lib/router.js#L49)
 
-Calls the layer handler on the given file if the `file.path` matches the layer pattern.
+Register one or more middleware handler methods. Handler methods may also be added by passing an array of handler names to the constructor on the `handlers` option.
+
+**Params**
+
+* `methods` **{string}**: Method names
+* `options` **{object}**
+* `returns` **{object}**: Returns the instance for chaining.
+
+**Example**
+
+```js
+router.handlers(['onLoad', 'preRender']);
+```
+
+### [.handler](lib/router.js#L67)
+
+Register a middleware handler method.
+
+**Params**
+
+* `method` **{string}**: Method name
+* `options` **{object}**
+* `returns` **{object}**: Returns the instance for chaining.
+
+**Example**
+
+```js
+router.handler('onLoad');
+```
+
+### [.route](lib/router.js#L124)
+
+Create a new router instance with all handler methods bound to the given pattern.
+
+**Params**
+
+* `pattern` **{string}**
+* `options` **{object}**: Options to pass to new router.
+* `returns` **{object}**: Returns a new router instance with handler methods bound to the given pattern.
+
+**Example**
+
+```js
+const router = new Router({ handlers: ['before', 'after'] });
+const file = { path: '/foo', content: '' };
+
+router.route('/foo')
+  .before(function(file) {
+    file.content += 'foo';
+  })
+  .after(function(file) {
+    file.content += 'bar';
+  });
+
+router.handle(file)
+  .then(() => {
+    assert.equal(file.content, 'foobar');
+  });
+```
+
+### [.handle](lib/router.js#L158)
+
+Run a middleware methods on the given `file`.
+
+**Params**
+
+* `method` **{string|file}**: The handler method to call on `file`. If the first argument is a file object, all handlers will be called on the file.
+* `file` **{object}**: File object
+* `returns` **{Promise}**
+
+**Example**
+
+```js
+// run a specific method
+router.handle('onLoad', file)
+  .then(file => console.log('File:', file))
+  .catch(console.error);
+
+// run multiple methods
+router.handle('onLoad', file)
+  .then(file => router.handle('preRender', file))
+  .catch(console.error);
+
+// run all methods
+router.handle(file)
+  .then(file => console.log('File:', file))
+  .catch(console.error);
+```
+
+### [.all](lib/router.js#L191)
+
+Runs all handler methods on the given file, in series.
 
 **Params**
 
@@ -45,25 +149,28 @@ Calls the layer handler on the given file if the `file.path` matches the layer p
 **Example**
 
 ```js
-layer.handle(file)
-  .then(() => console.log('Done:', file))
-  .then(console.error)
+router.all(file => {
+  file.data.title = 'Home';
+});
 ```
 
-### [.match](lib/layer.js#L71)
+### [.mixin](lib/router.js#L222)
 
-Attempts to match a file path with the layer pattern. If the path matches, an object of params is returned (see [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for details), otherwise `null` is returned.
+Mix router methods onto the given object.
 
 **Params**
 
-* `filepath` **{string}**
-* `returns` **{object|null}**
+* `target` **{object}**
+* `returns` **{undefined}**
 
 **Example**
 
 ```js
-const layer = new Layer('/:name');
-console.log(layer.match('/foo')) //=> { name: 'foo' }
+const router = new Router();
+const obj = {};
+router.handlers(['before', 'after']);
+router.mixin(obj);
+console.log(obj.before) //=> [function]
 ```
 
 ### [Route](lib/route.js#L28)
@@ -90,7 +197,7 @@ route.handle(file)
   });
 ```
 
-### [.all](lib/route.js#L56)
+### [.all](lib/route.js#L60)
 
 Register one or more handler functions to be called on all layers on the route.
 
@@ -111,7 +218,7 @@ route.all([
 ]);
 ```
 
-### [.handle](lib/route.js#L75)
+### [.handle](lib/route.js#L79)
 
 Run a middleware stack on the given `file`.
 
@@ -165,157 +272,57 @@ route.layers(/foo/, function);
 route.layers(/bar/, [function, function]);
 ```
 
-### [Route](lib/router.js#L20)
+### [Layer](lib/layer.js#L22)
 
-Create a new `Router` with the given options.
-
-**Params**
-
-* `options` **{object}**
-
-**Example**
-
-```js
-const route = new Router({ handlers: ['preWrite', 'postWrite']});
-```
-
-### [.handlers](lib/router.js#L44)
-
-Register one or more middleware handler methods. Handler methods may also be added by passing an array of handler names to the constructor on the `handlers` option.
-
-**Params**
-
-* `methods` **{string}**: Method names
-* `options` **{object}**
-* `returns` **{object}**: Returns the instance for chaining.
-
-**Example**
-
-```js
-router.handlers(['onLoad', 'preRender']);
-```
-
-### [.handler](lib/router.js#L62)
-
-Register a middleware handler method.
-
-**Params**
-
-* `method` **{string}**: Method name
-* `options` **{object}**
-* `returns` **{object}**: Returns the instance for chaining.
-
-**Example**
-
-```js
-router.handler('onLoad');
-```
-
-### [.route](lib/router.js#L119)
-
-Create a new router instance with all handler methods bound to the given pattern.
+Create a new `Layer` with the given `pattern`, handler function and options.
 
 **Params**
 
 * `pattern` **{string}**
-* `options` **{object}**: Options to pass to new router.
-* `returns` **{object}**: Returns a new router instance with handler methods bound to the given pattern.
+* `handler` **{function}**
+* `options` **{object}**
 
 **Example**
 
 ```js
-const router = new Router({ handlers: ['before', 'after'] });
-const file = { path: '/foo', content: '' };
-
-router.route('/foo')
-  .before(function(file) {
-    file.content += 'foo';
-  })
-  .after(function(file) {
-    file.content += 'bar';
-  });
-
-router.handle(file)
-  .then(() => {
-    assert.equal(file.content, 'foobar');
-  });
-```
-
-### [.handle](lib/router.js#L153)
-
-Run a middleware methods on the given `file`.
-
-**Params**
-
-* `method` **{string|file}**: The handler method to call on `file`. If the first argument is a file object, all handlers will be called on the file.
-* `file` **{object}**: File object
-* `returns` **{Promise}**
-
-**Example**
-
-```js
-// run a specific method
-router.handle('onLoad', file)
-  .then(file => console.log('File:', file))
-  .catch(console.error);
-
-// run multiple methods
-router.handle('onLoad', file)
-  .then(file => router.handle('preRender', file))
-  .catch(console.error);
-
-// run all methods
-router.handle(file)
-  .then(file => console.log('File:', file))
-  .catch(console.error);
-```
-
-### [.all](lib/router.js#L192)
-
-Runs all handler methods on the given file, in series.
-
-**Params**
-
-* `file` **{object}**: File object
-* `returns` **{Promise}**
-
-**Example**
-
-```js
-router.all(file => {
-  file.data.title = 'Home';
+const layer = new Layer('/', file => {
+  // do stuff to file
+  file.extname = '.html';
 });
 ```
 
-### [.mixin](lib/router.js#L225)
+### [.handle](lib/layer.js#L57)
 
-Mix router methods onto the given object.
+Calls the layer handler on the given file if the `file.path` matches the layer pattern.
 
 **Params**
 
-* `target` **{object}**
-* `returns` **{undefined}**
+* `file` **{object}**: File object
+* `returns` **{Promise}**
 
 **Example**
 
 ```js
-const router = new Router();
-const obj = {};
-router.handlers(['before', 'after']);
-router.mixin(obj);
-console.log(obj.before) //=> [function]
+layer.handle(file)
+  .then(() => console.log('Done:', file))
+  .then(console.error)
 ```
 
-### [toRegexpSource](lib/to-regex.js#L34)
+### [.match](lib/layer.js#L77)
 
-Create a regexp source string from the given value.
+Attempts to match a file path with the layer pattern. If the path matches, an object of params is returned (see [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for details), otherwise `null` is returned.
 
 **Params**
 
-* **{string|array|regexp}**: val
-* **{array}**: keys
-* **{object}**: options
-* `returns` **{regexp}**
+* `filepath` **{string}**
+* `returns` **{object|null}**
+
+**Example**
+
+```js
+const layer = new Layer('/:name');
+console.log(layer.match('/foo')) //=> { name: 'foo' }
+```
 
 ## Release history
 
@@ -377,7 +384,7 @@ You might also be interested in these projects:
 
 | **Commits** | **Contributor** | 
 | --- | --- |
-| 91 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 94 | [jonschlinkert](https://github.com/jonschlinkert) |
 | 35 | [doowb](https://github.com/doowb) |
 
 ### Author
@@ -401,4 +408,4 @@ Released under the [MIT License](LICENSE).
 
 ***
 
-_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on May 06, 2018._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.6.0, on May 12, 2018._

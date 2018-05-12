@@ -1,24 +1,25 @@
-console.time('Runtime');
+console.time('Total runtime');
 console.time('init');
 const Router = require('..');
-const router = new Router();
+const router = new Router({ handlers: ['foo'] });
 console.timeEnd('init');
 
-router.handlers(['onLoad']);
+const count = file => (file.count++);
 
+router.handler('foo');
 router
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
-  .onLoad(/./, file => (file.count++))
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
+  .foo(/./, count)
 
-router.handle('onLoad', { path: 'templates/pages/index.hbs', count: 0 })
+router.handle('foo', { path: 'templates/pages/index.hbs', count: 0 })
   .then(file => console.log('file.count:', file.count))
   .then(() => console.timeEnd('Total runtime'))
   .catch(console.error);

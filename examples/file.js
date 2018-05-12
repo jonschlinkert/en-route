@@ -5,7 +5,7 @@ const util = require('util');
 const assert = require('assert');
 
 /**
- * Create a new `File`.
+ * Create a new `File` with the given object. A File is a virtual file object.
  *
  * ```js
  * new File({ path: 'path/to/file.hbs' });

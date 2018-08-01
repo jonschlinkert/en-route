@@ -1,7 +1,7 @@
 {
   "name": "en-route",
   "description": "Routing for static site generators, build systems and task runners, heavily based on express.js routes but works with file objects. Used by Assemble, Verb, and Template.",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "homepage": "https://github.com/jonschlinkert/en-route",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "authors": [

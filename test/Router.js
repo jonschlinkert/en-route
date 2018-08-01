@@ -289,21 +289,21 @@ describe('handlers', function() {
       assert.throws(function() {
         const router = new Router({handlers: ['before'] });
         router.route('/foo').before(null);
-      }, /expected handler to be a function/);
+      }, /expected "before" handlers to be functions/);
     });
 
     it('should throw if a callback is undefined on a method', function() {
       assert.throws(function() {
         const router = new Router({handlers: ['before'] });
         router.route('/foo').before(undefined);
-      }, /expected handler to be a function/);
+      }, /expected "before" handlers to be functions/);
     });
 
     it('should throw if a callback is not a function on a method', function() {
       assert.throws(function() {
         const router = new Router({ handlers: ['before'] });
         router.route('/foo').before('not a function');
-      }, /expected handler to be a function/);
+      }, /expected "before" handlers to be functions/);
     });
 
     it('should not throw if all callbacks are functions on a method', function() {
